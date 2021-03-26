@@ -4,6 +4,7 @@ from flask import render_template, request, flash, url_for, redirect, current_ap
 from flask_login import login_required, current_user
 
 from . import compare
+from . import batch_processing
 from . forms import FileUploadForm
 
 from .. import db
@@ -18,6 +19,7 @@ def start_session():
 	form = FileUploadForm()
 	if form.validate_on_submit():
 		print(" 11 "* 100)
+		print()
 		# print(type(request.files.getlist('batch_1')[0]))
 		new_session = Session(user_id=current_user.id)
 		db.session.add(new_session)
@@ -31,19 +33,33 @@ def start_session():
 			current_app.config['UPLOAD_FOLDER'],
 			batch_1.filename
 			)
+		batch_1_source = request.form['batch_1_source']
 		batch_2 =  request.files.getlist('batch_2')[0]
 		batch_2_path = os.path.join(
 			current_app.config['UPLOAD_FOLDER'],
 			batch_2.filename
 			)
 		# print(batch_1.filename)
+		batch_2_source = request.form['batch_2_source']
 		batch_1.save(batch_1_path)
 		batch_2.save(batch_1_path)
 		# if batch_3:
 		# 	batch_3.save(os.path.join(current_app.config['UPLOAD_FOLDER'],batch_3.filename))
 			# return redirect(url_for('index'))
-		batch_1_record = Batch(filepath=batch_1_path)
-		batch_2_record = Batch(filepath=batch_2_path)
+		batch_1_record = Batch(
+			filepath=batch_1_path,
+			source=batch_1_source,
+			session_id=session_id
+			)
+		batch_2_record = Batch(
+			filepath=batch_2_path,
+			source=batch_2_source,
+			session_id=session_id
+			)
+		db.session.add(batch_1_record)
+		db.session.add(batch_2_record)
+		db.session.commit()
+		batch_processing.read_files(session_id)
 
 	return render_template(
 		'compare/start_session.html',
