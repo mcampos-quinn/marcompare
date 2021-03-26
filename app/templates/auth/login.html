@@ -1,15 +1,21 @@
-{% import "bootstrap/wtf.html" as wtf %}
 {% import "bootstrap/utils.html" as utils %}
+{% import "bootstrap/wtf.html" as wtf %}
+
 {% extends "base.html" %}
-{% block title %}Start session{% endblock %}
+
 {% block content %}
+<div class="jumbotron">
+    <h1 class="display-3">MARCompare</h1>
+    <p class="lead">compare marc files!</p>
+</div>
 <div class="card text-center mx-auto w-75">
 	<br/>
 	{{ utils.flashed_messages() }}
-	<h1>Upload files to compare</h1>
+	<h1>Log in to your account</h1>
 	<br/>
 	<div class="card-body">
 		{{ wtf.quick_form(form) }}
 	</div>
 </div>
+
 {% endblock %}

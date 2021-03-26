@@ -11,3 +11,5 @@ env.sh
 migrations
 htmlcov
 config.py
+tmp/
+!tmp/.keep

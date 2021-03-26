@@ -26,6 +26,34 @@ class User(UserMixin, db.Model):
 
 	sessions = db.relationship('Session', backref='user', lazy=True)
 
+	@property
+	def password(self):
+		"""
+		Prevent pasword from being accessed
+		"""
+		raise AttributeError('password is not a readable attribute.')
+
+	@password.setter
+	def password(self, password):
+		"""
+		Set password to a hashed password
+		"""
+		self.password_hash = generate_password_hash(password)
+
+	def verify_password(self, password):
+		"""
+		Check if hashed password matches actual password
+		"""
+		return check_password_hash(self.password_hash, password)
+
+	def __repr__(self):
+		return '<User: {}>'.format(self.username)
+
+# Set up user_loader
+@login_manager.user_loader
+def load_user(user_id):
+	return User.query.get(int(user_id))
+
 class Session(db.Model):
 	"""
 	Create a Session table
@@ -36,7 +64,7 @@ class Session(db.Model):
 	__tablename__ = 'sessions'
 
 	id = db.Column(db.Integer, primary_key=True)
-	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 	started_timestamp = db.Column(
 		db.DateTime,
 		default=datetime.datetime.utcnow
@@ -59,10 +87,11 @@ class Batch(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	session_id = db.Column(
 		db.Integer,
-		db.ForeignKey('session.id'),
+		db.ForeignKey('sessions.id'),
 		nullable=False
 		)
 	source = db.Column(db.String(200))
+	filepath = db.Column(db.String(200))
 
 	records = db.relationship('Record', backref='batch', lazy=True)
 
@@ -79,7 +108,7 @@ class Record(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	batch_id = db.Column(
 		db.Integer,
-		db.ForeignKey('batch.id'),
+		db.ForeignKey('batches.id'),
 		nullable=False
 		)
 	oclc_number = db.Column(db.String(200))
@@ -100,7 +129,7 @@ class Field(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	record_id = db.Column(
 		db.Integer,
-		db.ForeignKey('record.id'),
+		db.ForeignKey('records.id'),
 		nullable=False
 		)
 	tag = db.Column(db.String(100))
