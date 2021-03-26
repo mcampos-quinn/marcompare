@@ -2,8 +2,51 @@ import json
 import os
 import re
 
+from flask import current_app
+
 from .. import db
-from .. models import Batch, Session, Record, Field
+from .. models import Session, Batch, Record, Field
+from .. import app_utils
+
+def create_session(user_id):
+	new_session = Session(user_id=user_id)
+	db.session.add(new_session)
+	db.session.commit()
+	db.session.refresh(new_session)
+
+	return new_session.id
+
+def process_batches(session_id,request):
+	batch_1 = request.files.getlist('batch_1')[0]
+	batch_1_path = os.path.join(
+		current_app.config['UPLOAD_FOLDER'],
+		batch_1.filename
+		)
+	batch_1_source = request.form['batch_1_source']
+	batch_2 =  request.files.getlist('batch_2')[0]
+	batch_2_path = os.path.join(
+		current_app.config['UPLOAD_FOLDER'],
+		batch_2.filename
+		)
+	batch_2_source = request.form['batch_2_source']
+	batch_1.save(batch_1_path)
+	batch_2.save(batch_1_path)
+	# if batch_3:
+	# 	batch_3.save(os.path.join(current_app.config['UPLOAD_FOLDER'],batch_3.filename))
+		# return redirect(url_for('index'))
+	batch_1_record = Batch(
+		filepath=batch_1_path,
+		source=batch_1_source,
+		session_id=session_id
+		)
+	batch_2_record = Batch(
+		filepath=batch_2_path,
+		source=batch_2_source,
+		session_id=session_id
+		)
+	db.session.add(batch_1_record)
+	db.session.add(batch_2_record)
+	db.session.commit()
 
 def read_files(my_session_id):
 	the_session = Session.query.get(my_session_id)
