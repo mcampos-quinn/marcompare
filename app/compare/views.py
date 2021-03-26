@@ -42,14 +42,14 @@ def list_sessions():
 	"""
 	Render the session list template on the /list_sessions route
 	"""
-	query_text = '''
-	SELECT sessions.id, sessions.started_timestamp, GROUP_CONCAT(batches.source) AS sources
+	list_sessions_sql = '''
+	SELECT sessions.id, sessions.started_timestamp, GROUP_CONCAT(batches.source SEPARATOR ' ; ') AS sources
 	FROM sessions
 	JOIN batches ON sessions.id=batches.session_id
 	GROUP BY sessions.id, sessions.started_timestamp;
 	'''
 	# sql = "select sessions.id, sessions.started_timestamp, group_concat(batches.source) from sessions join batches on sessions.id=batches.session_id group by sessions.id, sessions.started_timestamp;"
-	sessions = db.session.execute(query_text).fetchall()
+	sessions = db.session.execute(list_sessions_sql).fetchall()
 	return render_template(
 		'compare/list_sessions.html',
 		title="Your comparison sessions",

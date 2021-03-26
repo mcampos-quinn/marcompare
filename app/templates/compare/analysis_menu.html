@@ -5,7 +5,7 @@
 <div class="card">
 	{% if id %}
 	<div class="list-group list-group-flush">
-		<a href="{{ url_for('compare.batch_compare', id=id) }}">
+		<a href="{{ url_for('compare.batch_compare', session_id=id) }}">
       Overview batch comparison
     </a>
 	</div>
