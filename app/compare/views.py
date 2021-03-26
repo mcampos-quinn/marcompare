@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 from sqlalchemy.sql import text
 
 from . import compare
+from . import analysis
 from . import batch_processing
 from . forms import FileUploadForm
 
@@ -72,3 +73,31 @@ def delete_session(id):
 	return redirect(url_for('compare.list_sessions'))
 
 	return render_template(title="Delete Session")
+
+@compare.route('/analysis_menu/session_<int:id>', methods=['GET','POST'])
+@login_required
+def analysis_menu(id):
+	"""
+	Render the analysis template on the /analysis_menu route
+	list the different analyses you can do an a session
+	"""
+	return render_template(
+		'compare/analysis_menu.html',
+		title="Analysis Menu",
+		id=id
+		)
+
+@compare.route('/batch_compare/session_<int:id>', methods=['GET','POST'])
+@login_required
+def batch_compare(session_id):
+	"""
+	Render the batch comparison template on the /batch_compare route
+	this is an overal comparison of two record batches from a session
+	"""
+
+	_batches = analysis.compare_batches(session_id)
+	return render_template(
+		'compare/batch_compare.html',
+		title="Compare batches",
+		_batches=_batches
+		)

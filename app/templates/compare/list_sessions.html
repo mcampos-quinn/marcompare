@@ -23,7 +23,11 @@
           {% for session in sessions %}
 
             <tr>
-              <td> {{ session.id }} </td>
+              <td>
+								<a href="{{ url_for('compare.analysis_menu', id=session.id) }}">
+									{{ session.id }}
+								</a>
+							</td>
               <td> {{ session.started_timestamp }} </td>
               <td> {{ session.sources }} </td>
               <td>

@@ -1,0 +1,39 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block title %}Comparing two batches{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body text-center">
+    <br/>
+    {{ utils.flashed_messages() }}
+    <br/>
+    <h1>Overall analysis</h1>
+      <hr>
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th width="15%"> Session ID </th>
+            <th width="40%"> Session timestamp </th>
+            <th width="30%"> Batch sources </th>
+            <th width="15%"> Delete </th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for session in sessions %}
+
+          <tr>
+            <td> {{ session.id }} </td>
+            <td> {{ session.started_timestamp }} </td>
+            <td> {{ session.sources }} </td>
+            <td>
+              <a href="{{ url_for('compare.delete_session', id=session.id) }}">
+                <i class="fa fa-trash"></i> Delete
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block title %}Perform an analysis{% endblock %}
+{% block content %}
+<div class="card">
+	{% if id %}
+	<div class="list-group list-group-flush">
+		<a href="{{ url_for('compare.batch_compare', id=id) }}">
+      Overview batch comparison
+    </a>
+	</div>
+	{% else %}
+	<div class="card">
+		<p>You don't have any sessions to compare. <a href="{{ url_for(compare.start_session)}}">Start a session.</a></p>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}
