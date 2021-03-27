@@ -12,6 +12,7 @@ from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+
 # local imports
 from config import config_options, ProductionConfig, DevelopmentConfig
 # init a loginManager
@@ -38,10 +39,15 @@ def create_app():#config_name):
 	# I wish I knew what this does...
 	Bootstrap(app)
 	from app import models
+	from flask_debugtoolbar import DebugToolbarExtension
+
+	toolbar = DebugToolbarExtension(app)
+
 
 
 	# init the db communication... ?
 	db.init_app(app)
+
 
 	login_manager.init_app(app)
 	login_manager.login_message = "You must be logged in to access this page."

@@ -3,12 +3,15 @@ import os
 import re
 
 from flask import current_app
+from sqlalchemy import create_engine, text
 
+import app
 from .. import db
 from .. models import Session, Batch, Record, Field
 from .. import app_utils
 
 def compare_batches(session_id):
+	engine = create_engine(current_app.config['SQLALCHEMY_DATABASE_URI'])
 	comparison_dict = {'batches':[]}
 	session_timestamp = Session.query.get(session_id).started_timestamp.strftime("%Y-%m-%d, %H:%M:%S")
 	comparison_dict['session timestamp'] = session_timestamp
@@ -37,51 +40,52 @@ def compare_batches(session_id):
 	FROM fields
 	WHERE fields.record_id=:record_id;
 	'''
-
-	for _batch in my_batches:
-		batch_dict = {}
-		batch_dict['source'] = _batch.source
-		batch_dict['no oclc match'] = 0
-		batch_dict['records w more fields'] = 0
-		batch_dict['record count'] = db.session.execute(
-			record_tally_sql,
-			{'batch': _batch.id}
-			).first()[0]
-		batch_records = db.session.execute(
-			get_batch_records_sql,
-			{'batch': _batch.id}
-			).fetchall()
-		# print('o '*100)
-		# print(batch_records)
-		for record in batch_records:
-			# print(type(record))
-			if record.oclc_number:
-				match = db.session.execute(
-						find_oclc_match_sql,
-						{
-							'record_a_oclc':record.oclc_number,
-							'record_a_batch':record.batch_id
-						}
-					).first()
-				if match:
-					record_field_count = db.session.execute(
-							get_field_count_sql,
+	with engine.connect() as connection:
+		for _batch in my_batches:
+			batch_dict = {}
+			batch_dict['source'] = _batch.source
+			batch_dict['no oclc match'] = 0
+			batch_dict['records w more fields'] = 0
+			batch_dict['record count'] = connection.execute(
+					text(record_tally_sql),
+					{'batch': _batch.id}
+				).first()[0]
+			batch_records = connection.execute(
+				text(get_batch_records_sql),
+				{'batch': _batch.id}
+				).fetchall()
+			# print('o '*100)
+			# print(batch_records)
+			for record in batch_records:
+				# print(type(record))
+				if record.oclc_number:
+					match = connection.execute(
+							text(find_oclc_match_sql),
 							{
-								'record_id':record.id
+								'record_a_oclc':record.oclc_number,
+								'record_a_batch':record.batch_id
 							}
-						).first()[0]
-					match_field_count = db.session.execute(
-							get_field_count_sql,
-							{
-								'record_id':match.id
-							}
-						).first()[0]
-					if record_field_count > match_field_count:
-						batch_dict['records w more fields'] += 1
+						).first()
+					if match:
+						record_field_count = connection.execute(
+								text(get_field_count_sql),
+								{
+									'record_id':record.id
+								}
+							).first()[0]
+						match_field_count = connection.execute(
+								text(get_field_count_sql),
+								{
+									'record_id':match.id
+								}
+							).first()[0]
+						if record_field_count > match_field_count:
+							batch_dict['records w more fields'] += 1
+					else:
+						batch_dict['no oclc match'] += 1
 				else:
 					batch_dict['no oclc match'] += 1
-			else:
-				batch_dict['no oclc match'] += 1
-		comparison_dict['batches'].append(batch_dict)
-	print(comparison_dict)
-	return comparison_dict
+			comparison_dict['batches'].append(batch_dict)
+		print(comparison_dict)
+		_session = Session.query.get(session_id)
+		return comparison_dict

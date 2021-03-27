@@ -3,6 +3,10 @@ import os
 import re
 
 from flask import current_app
+from sqlalchemy import create_engine, text, update
+from sqlalchemy import Column, Integer, Text, MetaData, Table
+
+from .db_handling import DB_Hookup
 
 from .. import db
 from .. models import Session, Batch, Record, Field
@@ -53,43 +57,63 @@ def read_files(my_session_id):
 	my_batches = Batch.query.filter_by(session_id=my_session_id).all()
 	# print("RUBY "*100)
 	for batch in my_batches:
-		parse_json(batch)
+		parse_json(batch.id,batch.filepath)
 
-def parse_json(batch):
-	with open(batch.filepath,'r') as f:
+def parse_json(batch_id,batch_filepath):
+	hookup = DB_Hookup()
+	with open(batch_filepath,'r') as f:
 		data = json.load(f)
-		for record in data['collection']['record']:
-			_record = Record(
-					batch_id = batch.id
+		with hookup.engine.connect() as connection:
+			for record in data['collection']['record']:
+				insert_record = hookup.metadata.tables['records'].insert().values(
+					{'batch_id':batch_id}
 				)
-			db.session.add(_record)
-			db.session.commit()
-			db.session.refresh(_record)
+				result = connection.execute(insert_record)
+				record_id = result.inserted_primary_key[0]
 
-			for data_tag in record['datafield']:
-				_tag = data_tag['@tag']
-				_ind1 = data_tag['@ind1']
-				_ind2 = data_tag['@ind2']
-				field_content =  parse_subfields(data_tag['subfield'])
-				_field = Field(
-					tag=_tag,
-					indicator_1=_ind1,
-					indicator_2=_ind2,
-					text=field_content,
-					record_id = _record.id
-				)
-				db.session.add(_field)
-				if data_tag['@tag'] == '035':
-					if isinstance(data_tag['subfield'],list):
-						for sf in data_tag['subfield']:
-							if sf['@code'] == 'a' and 'OCoLC' in sf['#text']:
-								_record.oclc_number = re.sub(r"\D", "", sf['#text']).lstrip('0')
-					elif isinstance(data_tag['subfield'],dict):
-						if data_tag['subfield']['@code'] == 'a' \
-							and 'OCoLC' in data_tag['subfield']['#text']:
-							# print(tag['subfield']['#text'])
-							_record.oclc_number = re.sub(r"\D", "", data_tag['subfield']['#text']).lstrip('0')
-			db.session.commit()
+				for data_tag in record['datafield']:
+					_tag = data_tag['@tag']
+					_ind1 = data_tag['@ind1']
+					_ind2 = data_tag['@ind2']
+					field_content =  parse_subfields(data_tag['subfield'])
+					insert_field = hookup.metadata.tables['fields'].insert().values(
+						{
+							'tag':_tag,
+							'indicator_1':_ind1,
+							'indicator_2':_ind2,
+							'text':field_content,
+							'record_id':record_id
+						}
+					)
+					connection.execute(insert_field)
+
+					# _field = Field(
+					# 	tag=_tag,
+					# 	indicator_1=_ind1,
+					# 	indicator_2=_ind2,
+					# 	text=field_content,
+					# 	record_id = record_id
+					# )
+					# db.session.add(_field)
+					if data_tag['@tag'] == '035':
+						oclc_number = None
+						if isinstance(data_tag['subfield'],list):
+							for sf in data_tag['subfield']:
+								if sf['@code'] == 'a' and 'OCoLC' in sf['#text']:
+									oclc_number = re.sub(r"\D", "", sf['#text']).lstrip('0')
+						elif isinstance(data_tag['subfield'],dict):
+							if data_tag['subfield']['@code'] == 'a' \
+								and 'OCoLC' in data_tag['subfield']['#text']:
+								# print(tag['subfield']['#text'])
+								oclc_number = re.sub(r"\D", "", data_tag['subfield']['#text']).lstrip('0')
+
+						if oclc_number:
+							update_oclc_number = hookup.metadata.tables['records'].update().values(
+								{'oclc_number':oclc_number}
+							)
+							connection.execute(update_oclc_number)
+
+				db.session.commit()
 
 def parse_subfields(_subfield):
 	_list = []
