@@ -112,6 +112,7 @@ class Record(db.Model):
 		nullable=False
 		)
 	oclc_number = db.Column(db.String(200))
+	raw_record = db.Column(db.Text)
 
 	fields = db.relationship('Field', backref='record', lazy='dynamic')
 

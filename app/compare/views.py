@@ -31,6 +31,9 @@ def start_session():
 		batch_processing.process_batches(session_id,request)
 		batch_processing.read_files(session_id)
 
+		flash('You have successfully deleted the session.')
+		return redirect(url_for('compare.list_sessions'))
+
 	return render_template(
 		'compare/start_session.html',
 		title="Start comparing",

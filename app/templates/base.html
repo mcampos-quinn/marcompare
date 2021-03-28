@@ -20,8 +20,16 @@
 			</button>
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<div class="navbar-nav">
-          <a class="nav-item nav-link" href="{{ url_for('home.dashboard') }}">Dashboard</a>
-					
+				{% if current_user.is_authenticated %}
+					{% if current_user.is_admin %}
+						<a class="nav-item nav-link" href="{{ url_for('home.admin_dashboard') }}">Admin Dashboard</a>
+					{% else %}
+	          <a class="nav-item nav-link" href="{{ url_for('home.dashboard') }}">Dashboard</a>
+					{% endif %}
+					<a class="nav-item nav-link" href="{{ url_for('auth.logout') }}">Log out</a>
+				{% else %}
+					<a class="nav-item nav-link" href="{{ url_for('auth.login') }}">Login</a>
+				{% endif %}
 				</div>
 			</div>
 		</nav>
