@@ -113,6 +113,8 @@ class Record(db.Model):
 		nullable=False
 		)
 	oclc_number = db.Column(db.String(200))
+	oclc_match_id = db.Column(db.Integer)
+	field_count = db.Column(db.Integer)
 	raw_record = db.Column(db.Text)
 
 	fields = db.relationship('Field', cascade="all,delete", backref='record', lazy='dynamic')

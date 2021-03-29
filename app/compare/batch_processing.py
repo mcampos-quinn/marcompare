@@ -5,9 +5,9 @@ import re
 import time
 
 from flask import current_app
-from sqlalchemy import create_engine, text, update
+from sqlalchemy import create_engine, text, update, and_
 from sqlalchemy import Column, Integer, Text, MetaData, Table
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, insert
 
 from .db_handling import DB_Hookup
 
@@ -77,6 +77,8 @@ def parse_json(batch_id,batch_filepath):
 				record_dict['oclc_number'] = None
 				# record_dict['record_id'] = None # we'll get this id later
 				record_dict['raw_record'] = str(record)
+				# get the count of data fields
+				record_dict['field_count'] = len(record['datafield'])
 				# Loop thru all the fields and grab the data
 				for data_tag in record['datafield']:
 					tag_dict = {}
