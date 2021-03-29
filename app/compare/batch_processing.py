@@ -150,6 +150,7 @@ def parse_json(batch_id,batch_filepath):
 				connection.execute(insert_fields)
 			# time.sleep(5)
 
+
 def chunker(iterable, n, fillvalue=None):
 	# This function will output a designated number of chunks from an
 	# iterable of arbitrary size. I need it to get around the SQLite3

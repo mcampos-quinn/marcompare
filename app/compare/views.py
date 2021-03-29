@@ -1,3 +1,4 @@
+import ast
 import os
 
 from flask import render_template, request, flash, url_for, redirect, current_app
@@ -11,6 +12,7 @@ from . forms import FileUploadForm
 
 from .. import db
 from .. models import Batch, Session
+from .. app_utils import get_session_timestamp
 
 def check_admin():
 	"""
@@ -31,7 +33,7 @@ def start_session():
 		batch_processing.process_batches(session_id,request)
 		batch_processing.read_files(session_id)
 
-		flash('You have successfully deleted the session.')
+		# flash('You have successfully deleted the session.')
 		return redirect(url_for('compare.list_sessions'))
 
 	return render_template(
@@ -82,12 +84,14 @@ def delete_session(id):
 def analysis_menu(id):
 	"""
 	Render the analysis template on the /analysis_menu route
-	list the different analyses you can do an a session
+	list the different analyses you can do on a session
 	"""
+	session_timestamp = get_session_timestamp(id)
 	return render_template(
 		'compare/analysis_menu.html',
 		title="Analysis Menu",
-		id=id
+		id=id,
+		session_timestamp=session_timestamp
 		)
 
 @compare.route('/batch_compare/session_<int:id>', methods=['GET','POST'])
@@ -97,8 +101,11 @@ def batch_compare(id):
 	Render the batch comparison template on the /batch_compare route
 	this is an overal comparison of two record batches from a session
 	"""
-
-	session_dict = analysis.compare_batches(id)
+	session_dict = Session.query.get(id).overall_batch_comparison_dict
+	if session_dict:
+		session_dict = ast.literal_eval(session_dict)
+	if not session_dict:
+		session_dict = analysis.compare_batches(id)
 	return render_template(
 		'compare/batch_compare.html',
 		title="Compare batches",

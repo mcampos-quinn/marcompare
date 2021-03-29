@@ -4,11 +4,14 @@
 {% block content %}
 <div class="card">
 	{% if id %}
-	<div class="list-group list-group-flush">
-		<a href="{{ url_for('compare.batch_compare', id=id) }}">
-      Overview batch comparison
-    </a>
-	</div>
+		{% if session_timestamp %}
+		<h3>Analysis Menu for session starting {{ session_timestamp }}</h3>
+		{% endif %}
+		<div class="list-group list-group-flush">
+			<a href="{{ url_for('compare.batch_compare', id=id) }}">
+	      Overview batch comparison
+	    </a>
+		</div>
 	{% else %}
 	<div class="card">
 		<p>You don't have any sessions to compare. <a href="{{ url_for(compare.start_session)}}">Start a session.</a></p>

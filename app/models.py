@@ -69,6 +69,7 @@ class Session(db.Model):
 		db.DateTime,
 		default=datetime.datetime.utcnow
 		)
+	overall_batch_comparison_dict = db.Column(db.Text)
 
 	batches = db.relationship('Batch', backref='session', lazy=True)
 
@@ -93,7 +94,7 @@ class Batch(db.Model):
 	source = db.Column(db.String(200))
 	filepath = db.Column(db.String(200))
 
-	records = db.relationship('Record', backref='batch', lazy=True)
+	records = db.relationship('Record', cascade="all,delete", backref='batch', lazy='dynamic')
 
 	def __repr__(self):
 		return '<Batch: {}>'.format(self.id)
@@ -114,7 +115,7 @@ class Record(db.Model):
 	oclc_number = db.Column(db.String(200))
 	raw_record = db.Column(db.Text)
 
-	fields = db.relationship('Field', backref='record', lazy='dynamic')
+	fields = db.relationship('Field', cascade="all,delete", backref='record', lazy='dynamic')
 
 	def __repr__(self):
 		return '<Record: {}>'.format(self.id)
