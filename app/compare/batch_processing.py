@@ -37,7 +37,7 @@ def process_batches(session_id,request):
 		)
 	batch_2_source = request.form['batch_2_source']
 	batch_1.save(batch_1_path)
-	batch_2.save(batch_1_path)
+	batch_2.save(batch_2_path)
 	# if batch_3:
 	# 	batch_3.save(os.path.join(current_app.config['UPLOAD_FOLDER'],batch_3.filename))
 		# return redirect(url_for('index'))
@@ -79,6 +79,34 @@ def parse_json(batch_id,batch_filepath):
 				record_dict['raw_record'] = str(record)
 				# get the count of data fields
 				record_dict['field_count'] = len(record['datafield'])
+				# get 1xx count
+				record_dict['author_field_count'] = len(
+					[x for x in record['datafield'] if x['@tag'].startswith('1')]
+					)
+				# get 2xx count
+				record_dict['title_field_count'] = len(
+					[x for x in record['datafield'] if x['@tag'].startswith('2')]
+					)
+				# get 3xx count
+				record_dict['physical_field_count'] = len(
+					[x for x in record['datafield'] if x['@tag'].startswith('3')]
+					)
+				# get 5xx count
+				record_dict['note_field_count'] = len(
+					[x for x in record['datafield'] if x['@tag'].startswith('5')]
+					)
+				# get 6xx count
+				record_dict['subject_field_count'] = len(
+					[x for x in record['datafield'] if x['@tag'].startswith('6')]
+					)
+				# get 7xx count
+				record_dict['added_author_field_count'] = len(
+					[x for x in record['datafield'] if x['@tag'].startswith('7')]
+					)
+				# get 856 count
+				record_dict['link_field_count'] = len(
+					[x for x in record['datafield'] if x['@tag'] == '856']
+					)
 				# Loop thru all the fields and grab the data
 				for data_tag in record['datafield']:
 					tag_dict = {}
@@ -150,9 +178,7 @@ def parse_json(batch_id,batch_filepath):
 					[x for x in chunk if x]
 					)
 				connection.execute(insert_fields)
-			# time.sleep(5)
-
-
+			
 def chunker(iterable, n, fillvalue=None):
 	# This function will output a designated number of chunks from an
 	# iterable of arbitrary size. I need it to get around the SQLite3

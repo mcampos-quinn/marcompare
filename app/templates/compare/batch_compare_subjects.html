@@ -1,0 +1,19 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block title %}Comparing two batches for 6xx data{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body text-center">
+    <br/>
+    {{ utils.flashed_messages() }}
+    <br/>
+    <h1>Subject batch analysis for session starting {{ session_dict['session timestamp'] }}</h1>
+      <hr>
+			{% if session_dict['batches'] == {} %}
+				<p>{{ session_dict}}</p>
+			{% else %}
+			<p>This session has no data to compare :/</p>
+			{% endif%}
+  </div>
+</div>
+{% endblock %}

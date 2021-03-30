@@ -3,6 +3,7 @@
 {% block title %}Perform an analysis{% endblock %}
 {% block content %}
 <div class="card">
+	{{ utils.flashed_messages() }}
 	{% if id %}
 		{% if session_timestamp %}
 		<h3>Analysis Menu for session starting {{ session_timestamp }}</h3>
@@ -10,6 +11,9 @@
 		<div class="list-group list-group-flush">
 			<a href="{{ url_for('compare.batch_compare', id=id) }}">
 	      Overview batch comparison
+	    </a>
+			<a href="{{ url_for('compare.batch_compare_subjects', id=id) }}">
+	      Subject (6xx) batch comparison
 	    </a>
 		</div>
 	{% else %}

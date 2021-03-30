@@ -70,6 +70,12 @@ class Session(db.Model):
 		default=datetime.datetime.utcnow
 		)
 	overall_batch_comparison_dict = db.Column(db.Text)
+	author_batch_comparison_dict = db.Column(db.Text)
+	title_batch_comparison_dict = db.Column(db.Text)
+	physical_batch_comparison_dict = db.Column(db.Text)
+	note_batch_comparison_dict = db.Column(db.Text)
+	subject_batch_comparison_dict = db.Column(db.Text)
+	added_author_batch_comparison_dict = db.Column(db.Text)
 
 	batches = db.relationship('Batch', backref='session', lazy=True)
 
@@ -94,6 +100,8 @@ class Batch(db.Model):
 	source = db.Column(db.String(200))
 	filepath = db.Column(db.String(200))
 
+	records_w_more_fields = db.Column(db.Integer)
+
 	records = db.relationship('Record', cascade="all,delete", backref='batch', lazy='dynamic')
 
 	def __repr__(self):
@@ -113,9 +121,25 @@ class Record(db.Model):
 		nullable=False
 		)
 	oclc_number = db.Column(db.String(200))
+	# this is the id of the record containing a matching oclc number
 	oclc_match_id = db.Column(db.Integer)
-	field_count = db.Column(db.Integer)
 	raw_record = db.Column(db.Text)
+	# all the fields
+	field_count = db.Column(db.Integer)
+	# 1xx
+	author_field_count = db.Column(db.Integer)
+	# 2xx
+	title_field_count = db.Column(db.Integer)
+	# 3xx
+	physical_field_count = db.Column(db.Integer)
+	# 5xx
+	note_field_count = db.Column(db.Integer)
+	# 6xx
+	subject_field_count = db.Column(db.Integer)
+	# 7xx
+	added_author_field_count = db.Column(db.Integer)
+	# 856
+	link_field_count = db.Column(db.Integer)
 
 	fields = db.relationship('Field', cascade="all,delete", backref='record', lazy='dynamic')
 

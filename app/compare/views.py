@@ -111,3 +111,28 @@ def batch_compare(id):
 		title="Compare batches",
 		session_dict=session_dict
 		)
+
+@compare.route('/batch_compare_subjects/session_<int:id>', methods=['GET','POST'])
+@login_required
+def batch_compare_subjects(id):
+	"""
+	Render the batch subject comparison template on the /subject_compare route
+	this is a comparison of two record batches from a session
+	focusing on 6xx fields
+	"""
+	session_dict = Session.query.get(id).subject_batch_comparison_dict
+	if session_dict:
+		session_dict = ast.literal_eval(session_dict)
+	if not session_dict:
+		overall_dict = Session.query.get(id).overall_batch_comparison_dict
+		if overall_dict:
+			session_dict = analysis.batch_compare_subjects(id)
+		else:
+			flash("Please run an overall comparison analysis\
+				on session {} before running more detailed analyses :)".format(id))
+			return redirect(url_for('compare.analysis_menu',id=id))
+	return render_template(
+		'compare/batch_compare_subjects.html',
+		title="Compare batches by subject",
+		session_dict=session_dict
+		)
