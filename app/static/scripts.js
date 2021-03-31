@@ -11,3 +11,8 @@ $(".btn").click(function () {
 		$('.equivalentRecords').show();
   }
 });
+
+$(document).ready(function () {
+  $('#compareTable').DataTable();
+  $('.dataTables_length').addClass('bs-select');
+});
