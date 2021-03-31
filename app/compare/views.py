@@ -133,6 +133,7 @@ def batch_compare_subjects(id):
 			flash("Please run an overall comparison analysis\
 				on session {} before running more detailed analyses :)".format(id))
 			return redirect(url_for('compare.analysis_menu',id=id))
+	print(session_dict)
 	return render_template(
 		'compare/batch_compare_subjects.html',
 		title="Compare batches by subject",

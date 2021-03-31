@@ -3,14 +3,18 @@
 {% block title %}Comparing two batches for 6xx data{% endblock %}
 {% block content %}
 <div class="card">
+	<br/>
+	{{ utils.flashed_messages() }}
+	<br/>
   <div class="card-body text-center">
-    <br/>
-    {{ utils.flashed_messages() }}
-    <br/>
-    <h1>Subject (6xx field) batch analysis for session starting {{ session_dict['session_timestamp'] }}</h1>
+		<h1>Subject (6xx field) batch analysis for session starting {{ session_dict['session_timestamp'] }}</h1>
 		<a href="{{ url_for('compare.analysis_menu', id=id)}}">Back to analysis menu for session {{ id }}</a>
-      <hr>
-			{% if session_dict['batches'] != [] %}
+    <hr>
+		{% if session_dict['batches'] != [] %}
+			<div class="btn-group" role="group" aria-label="data list options">
+				<button type="button" class="btn btn-primary" id="show-all">Show all the records</button>
+				<button type="button" class="btn btn-primary" id ="show-discrepancies">Show only records with discrepancies</button>
+			</div>
 				<!-- <p>{{ session_dict}}</p> -->
 				<table class="table table-striped table-bordered">
           <thead>
@@ -24,23 +28,29 @@
           </thead>
           <tbody>
           {% for row in session_dict['rows'] if not row['row'] == 0 %}
-            <tr>
+						{% if row['records'][0]['data']['color'] %}
+	            <tr class="diffRecords">
+								{% for record in row['records'] %}
+									{% if record['data']['color'] == 'green' %}
+										<td class="table-success">
+											Record {{ record['id'] }} has {{ record['data']['subject_field_count'] }} 6xx fields.
+			              </td>
+									{% elif record['data']['color'] == 'red' %}
+										<td class="table-danger">
+											Record {{ record['id'] }} has {{ record['data']['subject_field_count'] }} 6xx fields.
+										</td>
+									{% endif %}
+								{% endfor %}
+	            </tr>
+						{% else %}
+						<tr class="equivalentRecords">
 							{% for record in row['records'] %}
-								{% if record['data']['color'] == 'green' %}
-									<td class="table-success">
-										Record {{ record['id'] }} has {{ record['data']['subject_field_count'] }} 6xx fields.
-		              </td>
-								{% elif record['data']['color'] == 'red' %}
-									<td class="table-danger">
-										Record {{ record['id'] }} has {{ record['data']['subject_field_count'] }} 6xx fields.
-									</td>
-								{% else %}
 									<td>
 										Record {{ record['id'] }} has {{ record['data']['subject_field_count'] }} 6xx fields.
 									</td>
-								{% endif %}
 							{% endfor %}
-            </tr>
+						</tr>
+						{% endif %}
           {% endfor %}
           </tbody>
         </table>
@@ -49,4 +59,5 @@
 			{% endif%}
   </div>
 </div>
+
 {% endblock %}
