@@ -12,7 +12,14 @@ $(".btn").click(function () {
   }
 });
 
-$(document).ready(function () {
-  $('#compareTable').DataTable();
-  $('.dataTables_length').addClass('bs-select');
-});
+// this is for displaying tables using JQuery DataTables
+// var table = $('#compareTable').DataTable();
+//
+// var filteredRows = function selectOnlyFiltered(){
+//     table.rows({filter: 'applied'});
+// }
+// $(document).ready(function () {
+// 	// $('#compareTable').DataTable();
+// 	selectOnlyFiltered();
+//   $('.dataTables_length').addClass('bs-select');
+// });
