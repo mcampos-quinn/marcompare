@@ -101,7 +101,8 @@ def batch_compare(id):
 	Render the batch comparison template on the /batch_compare route
 	this is an overal comparison of two record batches from a session
 	"""
-	session_dict = Session.query.get(id).overall_batch_comparison_dict
+	_session = Session.query.get(id)
+	session_dict = _session.overall_batch_comparison_dict
 	if session_dict:
 		session_dict = ast.literal_eval(session_dict)
 	if not session_dict:
@@ -109,7 +110,8 @@ def batch_compare(id):
 	return render_template(
 		'compare/batch_compare.html',
 		title="Compare batches",
-		session_dict=session_dict
+		session_dict=session_dict,
+		id=id
 		)
 
 @compare.route('/batch_compare_subjects/session_<int:id>', methods=['GET','POST'])
@@ -134,5 +136,6 @@ def batch_compare_subjects(id):
 	return render_template(
 		'compare/batch_compare_subjects.html',
 		title="Compare batches by subject",
-		session_dict=session_dict
+		session_dict=session_dict,
+		id=id
 		)

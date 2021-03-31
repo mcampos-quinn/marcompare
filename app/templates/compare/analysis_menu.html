@@ -18,7 +18,7 @@
 		</div>
 	{% else %}
 	<div class="card">
-		<p>You don't have any sessions to compare. <a href="{{ url_for(compare.start_session)}}">Start a session.</a></p>
+		<p>You don't have any sessions to compare. <a href="{{ url_for('compare.start_session') }}">Start a session.</a></p>
 	</div>
 	{% endif %}
 </div>

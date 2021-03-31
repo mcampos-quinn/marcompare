@@ -164,7 +164,7 @@ def parse_json(batch_id,batch_filepath):
 			for record in db_records:
 				record['record_id'] = None
 				record['record_id'] = record_ids_temp[record['raw_record']]
-				print(record['record_id'])
+				# print(record['record_id'])
 				for tag_dict in record['fields']:
 					tag_dict['record_id'] = record['record_id']
 					fields.append(tag_dict)
@@ -178,7 +178,7 @@ def parse_json(batch_id,batch_filepath):
 					[x for x in chunk if x]
 					)
 				connection.execute(insert_fields)
-			
+
 def chunker(iterable, n, fillvalue=None):
 	# This function will output a designated number of chunks from an
 	# iterable of arbitrary size. I need it to get around the SQLite3

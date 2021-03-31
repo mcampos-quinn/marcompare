@@ -8,6 +8,7 @@
     {{ utils.flashed_messages() }}
     <br/>
     <h1>Overall analysis for session starting {{ session_dict['session timestamp'] }}</h1>
+		<a href="{{ url_for('compare.analysis_menu', id=id)}}">Back to analysis menu for session {{ id }}</a>
       <hr>
 			{% if not session_dict['batches'] == [] %}
       <table class="table table-striped table-bordered">
@@ -19,8 +20,8 @@
 					</tr>
 					<tr>
 						<th scope="row"> Total number of records </th>
-						<td>{{ session_dict['batches'][0]['record count'] }}</td>
-						<td>{{ session_dict['batches'][1]['record count'] }}</td>
+						<td>{{ session_dict['batches'][0]['records tally'] }}</td>
+						<td>{{ session_dict['batches'][1]['records tally'] }}</td>
 					</tr>
 					<tr>
 						<th scope="row"> Records with more fields </th>

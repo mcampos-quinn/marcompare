@@ -100,7 +100,9 @@ class Batch(db.Model):
 	source = db.Column(db.String(200))
 	filepath = db.Column(db.String(200))
 
+	records_tally = db.Column(db.Integer)
 	records_w_more_fields = db.Column(db.Integer)
+	records_w_no_oclc_match = db.Column(db.Integer)
 
 	records = db.relationship('Record', cascade="all,delete", backref='batch', lazy='dynamic')
 
