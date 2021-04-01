@@ -8,7 +8,7 @@
 	<br/>
   <div class="card-body text-center">
 		<h1>Subject (6xx field) batch analysis for session starting {{ session_dict['session_timestamp'] }}</h1>
-		<a href="{{ url_for('compare.analysis_menu', id=id)}}">Back to analysis menu for session {{ id }}</a>
+		<a href="{{ url_for('compare.analysis_menu', id=id) }}">Back to analysis menu for session {{ id }}</a>
     <hr>
 		{% if session_dict['batches'] != [] %}
 			<div class="btn-group" role="group" aria-label="data list options">
@@ -20,7 +20,7 @@
 				<table
 					data-toggle="table"
 					data-search="true"
-					data-pagination="true">
+					data-pagination="false">
           <thead>
             <tr>
 							<th width="10%">Row</th>
@@ -36,7 +36,13 @@
 						{% if row['records'][0]['data']['color'] %}
 	            <tr class="diffRecords">
 								<td>
-									<a href="#">{{ row['row'] }}</a>
+									{{row}}<br>
+									{{ row['row'] }}<br>
+									<a href="{{ url_for(
+										'compare.record_compare',
+										row=row,
+										session_id=id,
+										session_timestamp=session_dict['session_timestamp_int']) }}">{{ row['row'] }}</a>
 								</td>
 								{% for record in row['records'] %}
 									{% if record['data']['color'] == 'green' %}

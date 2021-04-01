@@ -1,0 +1,52 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block title %}Comparing two records{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body text-center">
+    <br/>
+    {{ utils.flashed_messages() }}
+    <br/>
+    <h1>Side by side comparison of records from session {{ session_id }}</h1>
+		<a href="{{ url_for('compare.analysis_menu', id=session_id)}}">Back to analysis menu for session {{ session_id }}</a>
+      <hr>
+			{% if compare_dict['records'] != [] %}
+				<!-- <p>{{compare_dict}}</p> -->
+				<table data-toggle="table">
+					<thead>
+						{% set cols = compare_dict['records'] | length %}
+						{% set width = 100/cols | int %}
+						{% set field_cols = cols * 4 %}
+						{% set tag_width = 10 // cols %}
+						{% set ind_width = 10 // cols %}
+						{% set text_width = 70 // cols %}
+						<tr  colspan="{{ field_cols }}">
+							{% for record in compare_dict['records'] %}
+								<th  colspan="4"> Record source: {{ record['source'] }} </th>
+							{% endfor %}
+						</tr>
+						<tr colspan="{{ field_cols }}">
+							{% for record in compare_dict['records'] %}
+								<th width="{{ tag_width }}%">Field number</th>
+								<th width="{{ ind_width }}%">Ind 1</th>
+								<th width="{{ ind_width }}%">Ind 2</th>
+								<th width="{{ text_width }}%">Field text</th>
+							{% endfor %}
+						</tr>
+					</thead>
+					<tbody>
+						{% for record in compare_dict['records'] %}
+							<td width="{{ tag_width }}%">x</td>
+							<td width="{{ ind_width }}%">Ind 1</td>
+							<td width="{{ ind_width }}%">Ind 2</td>
+							<td width="{{ text_width }}%">Field text</td>
+						{% endfor %}
+					</tbody>
+				</table>
+
+			{% else %}
+			<p>There are no records?? :/</p>
+			{% endif%}
+  </div>
+</div>
+{% endblock %}

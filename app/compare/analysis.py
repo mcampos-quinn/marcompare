@@ -117,6 +117,9 @@ def compare_batches(current_session_id):
 					s = records_table.select(
 						records_table.c.field_count
 						).where(records_table.c.id==a_record.oclc_match_id)
+					# s = records_table.select(
+					# 	records_table.c.field_count
+					# 	).where(records_table.c.id==a_record.oclc_match_id)
 					result = connection.execute(s)
 					# b = time.time()
 					# print("select based on match id: "+str(b-a))
@@ -164,10 +167,11 @@ def compare_batches(current_session_id):
 def batch_compare_subjects(current_session_id):
 	hookup = DB_Hookup()
 
+	get_title_sql = '''
+
+	'''
+
 	comparison_dict, my_batches, batch_ids = get_session_batches(current_session_id)
-	# for _batch in batch_ids:
-	# 	comparison_dict['batches'][_batch] = {}
-	# 	comparison_dict['batches'][_batch]['records'] = []
 	# print(comparison_dict)
 	with hookup.engine.connect() as connection:
 		batch_records_sql = '''
@@ -188,6 +192,7 @@ def batch_compare_subjects(current_session_id):
 				record_dict = {}
 				record_dict['id'] = row.id
 				record_dict['batch_id'] = str(row.batch_id) # this is a string in the batch_ids list
+				# record_dict['batch_source'] = str(row.batch_source)
 				record_dict['color'] = None
 				record_dict['oclc_match'] = row.oclc_match_id
 				# print('oclc match from subj '+str(record_dict['oclc_match']))
@@ -213,9 +218,11 @@ def batch_compare_subjects(current_session_id):
 					elif oclc_match['subject_field_count'] < _record["subject_field_count"]:
 						_record['color'] = 'green'
 						oclc_match['color'] = 'red'
+	session_timestamp = get_session_timestamp(current_session_id)
 	compare = {
 		'batches':[x.id for x in my_batches],
-		'session_timestamp':get_session_timestamp(current_session_id),
+		'session_timestamp': session_timestamp,
+		'session_timestamp_int': re.sub(r"\D", "", session_timestamp),
 		'rows':[{'row':0,'records':[]}]}
 	row_counter = 1
 	matched_records = []
@@ -243,6 +250,56 @@ def batch_compare_subjects(current_session_id):
 	_session.subject_batch_comparison_dict = str(compare)
 	db.session.commit()
 	return compare
+
+def compare_records(row_dict):
+	# {'row': 27,
+	# 'session_timestamp':1235,
+	# 'records': [
+	# 	{'id': 503, 'data': {'batch_id': '15', 'color': None, 'subject_field_count': 3, 'oclc_match_id': 537}},
+	# 	{'id': 537, 'data': {'batch_id': '16', 'color': None, 'subject_field_count': 3, 'oclc_match_id': 503}}
+	# 	]
+	# }
+	hookup = DB_Hookup()
+
+	get_fields_sql = '''
+	fields.record_id=:record_id
+	'''
+	# batch_source_sql = '''
+	# INNER JOIN records
+	# ON batches.id=:record_id;
+	# '''
+	compare_dict = {
+		'records':[]
+		}
+	with hookup.engine.connect() as connection:
+		fields_table = hookup.metadata.tables['fields']
+		batches_table = hookup.metadata.tables['batches']
+		for record in row_dict['records']:
+			print(record)
+			record_dict = {"record" : record['id'], 'fields':[]}
+			source = Batch.query.get(int(record['data']['batch_id'])).source
+			record_dict['batch_source'] = source
+
+			s = fields_table.select().where(
+				fields_table.c.record_id==record['id'])
+			fields = connection.execute(s).fetchall()
+
+			for field in fields:
+				field_dict = {
+					field.id : {
+						'tag':field.tag,
+						'ind1':field.indicator_1,
+						'ind2':field.indicator_2,
+						'text':field.text
+						}
+					}
+				record_dict['fields'].append(
+					field_dict
+				)
+			compare_dict['records'].append(record_dict)
+
+	print(compare_dict)
+	return compare_dict
 
 def build_field_comparison_dict(record,field_set_count):
 	# field_set_count should be e.g. record['subject_field_count']

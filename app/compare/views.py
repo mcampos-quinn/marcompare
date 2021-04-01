@@ -118,7 +118,7 @@ def batch_compare(id):
 @login_required
 def batch_compare_subjects(id):
 	"""
-	Render the batch subject comparison template on the /subject_compare route
+	Render the batch subject comparison template on the /batch_compare_subjects route
 	this is a comparison of two record batches from a session
 	focusing on 6xx fields
 	"""
@@ -141,29 +141,25 @@ def batch_compare_subjects(id):
 		id=id
 		)
 
-@compare.route('/record_compare_subjects/row_<int:id>', methods=['GET','POST'])
+@compare.route('/record_compare/<row>_<session_id>_<session_timestamp>', methods=['GET','POST'])
 @login_required
-def record_compare_subjects(id):
+def record_compare(row,session_timestamp,session_id):
 	"""
-	Render the batch subject comparison template on the /subject_compare route
-	this is a comparison of two record batches from a session
-	focusing on 6xx fields
+	Render the record comparison template on the /record_compare route
+	this is a comparison of two records that match on OCLC number from a session
 	"""
-	session_dict = Session.query.get(id).subject_batch_comparison_dict
-	if session_dict:
-		session_dict = ast.literal_eval(session_dict)
-	if not session_dict:
-		overall_dict = Session.query.get(id).overall_batch_comparison_dict
-		if overall_dict:
-			session_dict = analysis.batch_compare_subjects(id)
-		else:
-			flash("Please run an overall comparison analysis\
-				on session {} before running more detailed analyses :)".format(id))
-			return redirect(url_for('compare.analysis_menu',id=id))
-	print(session_dict)
+	print("& & "*200)
+	print(row)
+	row = ast.literal_eval(row)
+	print(row)
+	row_id = row['row']
+	compare_dict = analysis.compare_records(row)
+
 	return render_template(
-		'compare/batch_compare_subjects.html',
-		title="Compare batches by subject",
-		session_dict=session_dict,
-		id=id
+		'compare/record_compare.html',
+		title="Compare records",
+		# session_timestamp=session_timestamp,
+		session_id=session_id,
+		id=row_id,
+		compare_dict=compare_dict
 		)
