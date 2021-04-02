@@ -148,10 +148,10 @@ def record_compare(row,session_timestamp,session_id):
 	Render the record comparison template on the /record_compare route
 	this is a comparison of two records that match on OCLC number from a session
 	"""
-	print("& & "*200)
-	print(row)
+	# print("& & "*200)
+	# print(row)
 	row = ast.literal_eval(row)
-	print(row)
+	# print(row)
 	row_id = row['row']
 	compare_dict = analysis.compare_records(row)
 

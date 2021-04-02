@@ -75,6 +75,7 @@ def parse_json(batch_id,batch_filepath):
 				record_dict['fields'] = []
 				record_dict['batch_id'] = batch_id
 				record_dict['oclc_number'] = None
+				record_dict['title'] = None
 				# record_dict['record_id'] = None # we'll get this id later
 				record_dict['raw_record'] = str(record)
 				# get the count of data fields
@@ -127,6 +128,15 @@ def parse_json(batch_id,batch_filepath):
 							if data_tag['subfield']['@code'] == 'a' \
 								and 'OCoLC' in data_tag['subfield']['#text']:
 								record_dict['oclc_number'] = re.sub(r"\D", "", data_tag['subfield']['#text']).lstrip('0')
+					# look for a 245 to be "title"
+					if data_tag['@tag'] == '245':
+						title = None
+						if isinstance(data_tag['subfield'],list):
+							title = ' '.join([sf['#text'] for sf in data_tag['subfield']])
+							record_dict['title'] = title
+						elif isinstance(data_tag['subfield'],dict):
+							record_dict['title'] = data_tag['subfield']['#text']
+
 				db_records.append(record_dict)
 			# Take out the field list from each record temporarily so we
 			# can insert the records themselves in bulk to the DB (saves A LOT

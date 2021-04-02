@@ -23,11 +23,11 @@
 					data-pagination="false">
           <thead>
             <tr>
-							<th width="10%">Row</th>
+							<th width="10%">Compare records</th>
 							{% set cols = session_dict['batches'] | length %}
 							{% set width = 90/cols | int %}
 							{% for batch in session_dict['batches'] %}
-	              <th width="{{ width }}%"> Batch source: {{ batch.source }} </th>
+	              <th width="{{ width }}%"> Batch source: {{ batch['source'] }} </th>
 							{% endfor %}
             </tr>
           </thead>
@@ -36,22 +36,24 @@
 						{% if row['records'][0]['data']['color'] %}
 	            <tr class="diffRecords">
 								<td>
-									{{row}}<br>
-									{{ row['row'] }}<br>
 									<a href="{{ url_for(
 										'compare.record_compare',
 										row=row,
 										session_id=id,
-										session_timestamp=session_dict['session_timestamp_int']) }}">{{ row['row'] }}</a>
+										session_timestamp=session_dict['session_timestamp_int']) }}">
+										{{ row['row'] }}
+									</a>
 								</td>
 								{% for record in row['records'] %}
 									{% if record['data']['color'] == 'green' %}
 										<td class="table-success">
-											Record {{ record['id'] }} has {{ record['data']['subject_field_count'] }} 6xx fields.
+											Record <b>{{ record['id'] }}</b> has <b>{{ record['data']['subject_field_count'] }} 6xx fields</b>.<br>
+											{{ record['data']['title'] }}
 			              </td>
 									{% elif record['data']['color'] == 'red' %}
 										<td class="table-danger">
-											Record {{ record['id'] }} has {{ record['data']['subject_field_count'] }} 6xx fields.
+											Record <b>{{ record['id'] }}</b> has <b>{{ record['data']['subject_field_count'] }} 6xx fields</b>.<br>
+											{{ record['data']['title'] }}
 										</td>
 									{% endif %}
 								{% endfor %}
@@ -63,7 +65,8 @@
 							</td>
 							{% for record in row['records'] %}
 								<td>
-									Record {{ record['id'] }} has {{ record['data']['subject_field_count'] }} 6xx fields.
+									Record <b>{{ record['id'] }}</b> has <b>{{ record['data']['subject_field_count'] }} 6xx fields</b>.<br>
+									{{ record['data']['title'] }}
 								</td>
 							{% endfor %}
 						</tr>

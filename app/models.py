@@ -122,6 +122,7 @@ class Record(db.Model):
 		db.ForeignKey('batches.id'),
 		nullable=False
 		)
+	title = db.Column(db.Text)
 	oclc_number = db.Column(db.String(200))
 	# this is the id of the record containing a matching oclc number
 	oclc_match_id = db.Column(db.Integer)

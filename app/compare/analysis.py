@@ -167,10 +167,6 @@ def compare_batches(current_session_id):
 def batch_compare_subjects(current_session_id):
 	hookup = DB_Hookup()
 
-	get_title_sql = '''
-
-	'''
-
 	comparison_dict, my_batches, batch_ids = get_session_batches(current_session_id)
 	# print(comparison_dict)
 	with hookup.engine.connect() as connection:
@@ -191,6 +187,7 @@ def batch_compare_subjects(current_session_id):
 				# print(row.id)
 				record_dict = {}
 				record_dict['id'] = row.id
+				record_dict['title'] = row.title
 				record_dict['batch_id'] = str(row.batch_id) # this is a string in the batch_ids list
 				# record_dict['batch_source'] = str(row.batch_source)
 				record_dict['color'] = None
@@ -219,8 +216,12 @@ def batch_compare_subjects(current_session_id):
 						_record['color'] = 'green'
 						oclc_match['color'] = 'red'
 	session_timestamp = get_session_timestamp(current_session_id)
+	batches = []
+	for b in my_batches:
+		d = {'id':b.id,'source':b.source}
+		batches.append(d)
 	compare = {
-		'batches':[x.id for x in my_batches],
+		'batches':batches,
 		'session_timestamp': session_timestamp,
 		'session_timestamp_int': re.sub(r"\D", "", session_timestamp),
 		'rows':[{'row':0,'records':[]}]}
@@ -252,6 +253,7 @@ def batch_compare_subjects(current_session_id):
 	return compare
 
 def compare_records(row_dict):
+	# this is the row_dict that gets passed:
 	# {'row': 27,
 	# 'session_timestamp':1235,
 	# 'records': [
@@ -269,35 +271,145 @@ def compare_records(row_dict):
 	# ON batches.id=:record_id;
 	# '''
 	compare_dict = {
-		'records':[]
-		}
+		'records': [
+ 			{'record':None,
+			'column':None,
+			'data': {
+	 			'batch_source':'SOURCE',
+	 			'title':"TITLE"
+				}
+ 			}
+ 		],
+		'rows': [
+			{'row': None,
+			'fields': [
+				{'field_id': None,
+				'color': None,
+				'column':None,
+				'data': {
+					'record_id': None,
+					'tag': None,
+					'ind1': '',
+					'ind2': '',
+					'text': None
+					}
+					}
+				]
+			}
+		]
+	}
+	empty_field = {
+		'field_id': '',
+		'color': 'red',
+		'data': {
+			'record_id': '',
+			'tag': '',
+			'ind1': '',
+			'ind2': '',
+			'text': ''
+			}
+	}
 	with hookup.engine.connect() as connection:
 		fields_table = hookup.metadata.tables['fields']
 		batches_table = hookup.metadata.tables['batches']
+
+		fields_list = []
 		for record in row_dict['records']:
 			print(record)
-			record_dict = {"record" : record['id'], 'fields':[]}
+			record_dict = {'record':record['id'],'column':None,'data':{}}
 			source = Batch.query.get(int(record['data']['batch_id'])).source
-			record_dict['batch_source'] = source
+			print(source)
+			record_dict['record'] = record['id']
+			record_dict['column'] = row_dict['records'].index(record)
+			record_dict['data']['batch_source'] = source
+			record_dict['data']['title'] = record['data']['title']
+
+			compare_dict['records'].append(record_dict)
 
 			s = fields_table.select().where(
 				fields_table.c.record_id==record['id'])
 			fields = connection.execute(s).fetchall()
+			# print(fields)
 
 			for field in fields:
 				field_dict = {
-					field.id : {
+					'field_id':field.id,
+					'color': None,
+					'column':record_dict['column'],
+					 'data':{
+					 	'record_id':record['id'],
 						'tag':field.tag,
 						'ind1':field.indicator_1,
 						'ind2':field.indicator_2,
 						'text':field.text
 						}
 					}
-				record_dict['fields'].append(
+				fields_list.append(
 					field_dict
 				)
-			compare_dict['records'].append(record_dict)
+				del field
+			del fields
+	# now do the field matching
+	# print(fields_list)
+	row_counter = 1
+	matched_fields = []
+	num_records = len(row_dict['records'])
+	rows = []
+	for field in fields_list:
+		if not field in matched_fields:
+		# check that the field hasn't already been matched
+			# if not any([i for i in rows if field in i['fields']]):
+			row = {
+				'row':row_counter,
+				'fields':[None for i in range(num_records)]
+			}
 
+			matched_tags = [
+				f for f in fields_list \
+				if f['column'] != field['column'] and \
+				f['data']['tag'] == field['data']['tag']
+			]
+			if matched_tags != []:
+				for f in matched_tags:
+					if f['data']['text'][0] == field['data']['text']:
+						row['fields'][f['column']] = f
+						matched_fields.append(f)
+						row['fields'][field['column']] = field
+						matched_fields.append(field)
+					else:
+						f['data']['color'] = 'yellow'
+						field['data']['color'] = 'yellow'
+						row['fields'][f['column']] = f
+						matched_fields.append(f)
+						row['fields'][field['column']] = field
+						matched_fields.append(field)
+
+			if matched_tags == []:
+				field['color'] = 'green'
+				row['fields'][field['column']] = field
+				matched_fields.append(field)
+
+			rows.append(row)
+			row_counter +=1
+			# del field
+	# print(matched_fields)
+	for row in rows:
+		# print(row)
+		row['fields'] = [empty_field if x == None else x for x in row['fields']]
+		# for field in row['fields']:
+		# 	print(field)
+		# 	if field == None:
+		# 		print("% %"*200)
+		# 		row['fields'].insert(row['fields'].index(field), empty_field)
+		compare_dict['rows'].append(row)
+
+	# print(fields_list)
+	# print(compare_dict)
+	# for field_dict in fields:
+
+
+
+	# compare_dict['rows'].append(row)
 	print(compare_dict)
 	return compare_dict
 
@@ -307,6 +419,7 @@ def build_field_comparison_dict(record,field_set_count):
 			'id':record['id'],
 			'data':{
 				'batch_id':record['batch_id'],
+				'title':record['title'],
 				'color':record['color'],
 				'subject_field_count':record[field_set_count],
 				'oclc_match_id':record['oclc_match']
