@@ -12,7 +12,9 @@
       <hr>
 			{% if compare_dict['records'] != [] %}
 				<!-- <p>{{compare_dict}}</p> -->
-				<table data-toggle="table">
+				<table
+				data-toggle="table"
+				data-search="true">
 					<thead>
 						{% set cols = compare_dict['records'] | length %}
 						{% set width = 100/cols | int %}
@@ -38,10 +40,20 @@
 					{% for row in compare_dict['rows'] if not row['row'] == None %}
 						<tr>
 							{% for field in row['fields'] %}
-								<td width="{{ tag_width }}%">{{ field['data']['tag'] }}</td>
-								<td width="{{ ind_width }}%">{{ field['data']['ind1'] }}</td>
-								<td width="{{ ind_width }}%">{{ field['data']['ind2'] }}</td>
-								<td width="{{ text_width }}%">{{ field['data']['text'] }}</td>
+								{% if field['color'] == 'yellow' %}
+									{% set class = 'table-warning' %}
+								{% elif field['color'] == 'red' %}
+									{% set class = 'table-danger' %}
+								{% elif field['color'] == 'green' %}
+									{% set class = 'table-success' %}
+								{% else %}
+									{% set class = '' %}
+								{% endif %}
+
+								<td class="{{ class }}" width="{{ tag_width }}%">{{ field['data']['tag'] }}</td>
+								<td class="{{ class }}" width="{{ ind_width }}%">{{ field['data']['ind1'] }}</td>
+								<td class="{{ class }}" width="{{ ind_width }}%">{{ field['data']['ind2'] }}</td>
+								<td class="{{ class }}" width="{{ text_width }}%">{{ field['data']['text'] }}</td>
 							{% endfor %}
 						</tr>
 					{% endfor %}

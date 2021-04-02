@@ -3,6 +3,8 @@ import os
 import re
 import time
 
+from collections import Counter
+
 from flask import current_app
 from sqlalchemy import create_engine, text, func, and_, or_, bindparam
 from sqlalchemy.sql import insert, select, update
@@ -301,6 +303,7 @@ def compare_records(row_dict):
 	empty_field = {
 		'field_id': '',
 		'color': 'red',
+		'column': None,
 		'data': {
 			'record_id': '',
 			'tag': '',
@@ -315,6 +318,7 @@ def compare_records(row_dict):
 
 		fields_list = []
 		for record in row_dict['records']:
+			# first grab the basic info for the records in the comparison
 			print(record)
 			record_dict = {'record':record['id'],'column':None,'data':{}}
 			source = Batch.query.get(int(record['data']['batch_id'])).source
@@ -349,8 +353,8 @@ def compare_records(row_dict):
 				)
 				del field
 			del fields
+
 	# now do the field matching
-	# print(fields_list)
 	row_counter = 1
 	matched_fields = []
 	num_records = len(row_dict['records'])
@@ -371,45 +375,61 @@ def compare_records(row_dict):
 			]
 			if matched_tags != []:
 				for f in matched_tags:
-					if f['data']['text'][0] == field['data']['text']:
+					if f['data']['text'] == field['data']['text']:
 						row['fields'][f['column']] = f
 						matched_fields.append(f)
 						row['fields'][field['column']] = field
 						matched_fields.append(field)
 					else:
-						f['data']['color'] = 'yellow'
-						field['data']['color'] = 'yellow'
+						f['color'] = 'yellow'
+						field['color'] = 'yellow'
 						row['fields'][f['column']] = f
 						matched_fields.append(f)
 						row['fields'][field['column']] = field
 						matched_fields.append(field)
 
 			if matched_tags == []:
+				other_column = [
+					x for x in range(num_records) \
+					if not x == field['column']
+					][0]
 				field['color'] = 'green'
 				row['fields'][field['column']] = field
+				row['fields'][other_column] = empty_field
+				row['fields'][other_column]['column'] = other_column
 				matched_fields.append(field)
 
 			rows.append(row)
 			row_counter +=1
-			# del field
+
 	# print(matched_fields)
 	for row in rows:
-		# print(row)
-		row['fields'] = [empty_field if x == None else x for x in row['fields']]
-		# for field in row['fields']:
-		# 	print(field)
-		# 	if field == None:
-		# 		print("% %"*200)
-		# 		row['fields'].insert(row['fields'].index(field), empty_field)
-		compare_dict['rows'].append(row)
+		print(row)
+		for i,f in enumerate(row['fields']):
+			print(f)
+			if f == None:
+				row['fields'][i] = empty_field
+				print(empty_field)
+		# row['fields'] = [empty_field if x == None else x for x in row['fields']]
+	compare_dict['rows'] = rows
 
-	# print(fields_list)
-	# print(compare_dict)
-	# for field_dict in fields:
+	# sort the rows by field tag giving precedence to the
+	# reocrd with the most fields
+	cols = []
+	for row in compare_dict['rows']:
+		for field in row['fields']:
+			if not field['data']['tag'] == '':
+				cols.append(field['column'])
+	counted = Counter(cols)
+	longest = [c for c in counted.keys() if counted[c] == max(counted.values())][0]
+	print("** ** "*100)
+	print(longest)
+	compare_dict['rows'].sort(
+		key=lambda x: [\
+		y['data']['tag'] for y in x['fields'] \
+		if y['column'] == longest]
+		)
 
-
-
-	# compare_dict['rows'].append(row)
 	print(compare_dict)
 	return compare_dict
 

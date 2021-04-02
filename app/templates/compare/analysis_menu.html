@@ -4,22 +4,24 @@
 {% block content %}
 <div class="card">
 	{{ utils.flashed_messages() }}
-	{% if id %}
-		{% if session_timestamp %}
-		<h3>Analysis Menu for session starting {{ session_timestamp }}</h3>
-		{% endif %}
-		<div class="list-group list-group-flush">
-			<a href="{{ url_for('compare.batch_compare', id=id) }}">
-	      Overview batch comparison
-	    </a>
-			<a href="{{ url_for('compare.batch_compare_subjects', id=id) }}">
-	      Subject (6xx) batch comparison
-	    </a>
+	<div class="card-body text-center">
+		{% if id %}
+			{% if session_timestamp %}
+			<h3>Analysis Menu for session starting {{ session_timestamp }}</h3>
+			{% endif %}
+			<div class="list-group active">
+				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare', id=id) }}">
+		      Overview batch comparison
+		    </a>
+				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_subjects', id=id) }}">
+		      Subject (6xx) batch comparison
+		    </a>
+			</div>
+		{% else %}
+		<div class="card">
+			<p>You don't have any sessions to compare. <a href="{{ url_for('compare.start_session') }}">Start a session.</a></p>
 		</div>
-	{% else %}
-	<div class="card">
-		<p>You don't have any sessions to compare. <a href="{{ url_for('compare.start_session') }}">Start a session.</a></p>
+		{% endif %}
 	</div>
-	{% endif %}
 </div>
 {% endblock %}
