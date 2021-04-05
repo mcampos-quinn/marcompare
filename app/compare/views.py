@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from sqlalchemy.sql import text
 
 from . import compare
-from . import analysis
+from . import record_analysis, batch_analysis
 from . import batch_processing
 from . forms import FileUploadForm
 
@@ -106,7 +106,7 @@ def batch_compare(id):
 	if session_dict:
 		session_dict = ast.literal_eval(session_dict)
 	if not session_dict:
-		session_dict = analysis.compare_batches(id)
+		session_dict = batch_analysis.compare_batches(id)
 	return render_template(
 		'compare/batch_compare.html',
 		title="Compare batches",
@@ -128,7 +128,7 @@ def batch_compare_subjects(id):
 	if not session_dict:
 		overall_dict = Session.query.get(id).overall_batch_comparison_dict
 		if overall_dict:
-			session_dict = analysis.batch_compare_subjects(id)
+			session_dict = batch_analysis.batch_compare_subjects(id)
 		else:
 			flash("Please run an overall comparison analysis\
 				on session {} before running more detailed analyses :)".format(id))
@@ -153,7 +153,7 @@ def record_compare(row,session_timestamp,session_id):
 	row = ast.literal_eval(row)
 	# print(row)
 	row_id = row['row']
-	compare_dict = analysis.compare_records(row)
+	compare_dict = record_analysis.compare_records(row)
 
 	return render_template(
 		'compare/record_compare.html',

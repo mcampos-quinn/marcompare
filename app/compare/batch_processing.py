@@ -65,8 +65,8 @@ def process_batches(session_id,request):
 	batch_2_record = Batch(
 		filepath=batch_2_path,
 		source=batch_2_source,
-		namespaces=batch_1_namespaces,
-		identifier_field=batch_1_identifier_field,
+		namespaces=batch_2_namespaces,
+		identifier_field=batch_2_identifier_field,
 		session_id=session_id
 		)
 	db.session.add(batch_1_record)
@@ -93,6 +93,8 @@ def parse_json(batch_id,batch_filepath,identifier_field,namespaces):
 	else:
 		prefix = ""
 	hookup = DB_Hookup()
+	print("&& & &"*300)
+	print(prefix)
 	with open(batch_filepath,'r') as f:
 		data = json.load(f)
 		db_records = []
@@ -147,7 +149,7 @@ def parse_json(batch_id,batch_filepath,identifier_field,namespaces):
 					# Now look for an OCLC number
 					if identifier_field == '001':
 						if control_tag['@tag'] == '001':
-							record_dict['oclc_number'] = control_tag['#text'].lstrip('0')
+							record_dict['oclc_number'] = re.sub(r"\D", "", control_tag['#text']).lstrip('0')
 
 				# Loop thru all the data fields and grab data
 				for data_tag in record[prefix+'datafield']:
