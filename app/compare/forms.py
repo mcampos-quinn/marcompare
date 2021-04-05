@@ -2,9 +2,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileRequired, FileAllowed, FileField
 import wtforms
-from wtforms.fields import MultipleFileField, StringField
+from wtforms.fields import MultipleFileField, StringField, SelectField, BooleanField
 from wtforms.validators import DataRequired, Email
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+# from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 
 class FileUploadForm(FlaskForm):
@@ -12,9 +12,29 @@ class FileUploadForm(FlaskForm):
 	Session upload form
 	tbd: how to handle more than two files
 	'''
-	batch_1 = FileField('File 1',validators=[FileRequired(),FileAllowed(['json','csv','pdf'])])
-	batch_1_source = StringField('Optional: list the source of this file')
-	batch_2 = FileField('File 2',validators=[FileRequired(),FileAllowed(['json','csv','pdf'])])
-	batch_2_source = StringField('Optional: list the source of this file')
+	batch_1 = FileField('Batch 1',validators=[FileRequired(),FileAllowed(['json'])])
+	batch_1_source = StringField('Batch source')
+	batch_1_identifier_field = SelectField(
+		'Field w/ OCLC number',
+		choices=[('001', '001'), ('035', '035')],
+		default='001'
+		)
+	batch_1_namespaces = BooleanField(
+		'Does this file use XML namespaces?',
+		default=False
+		)
+
+	batch_2 = FileField('Batch 2',validators=[FileRequired(),FileAllowed(['json'])])
+	batch_2_source = StringField('Batch source')
+	batch_2_identifier_field = SelectField(
+		'Field w/ OCLC number',
+		choices=[('001', '001'), ('035', '035')],
+		default='001'
+		)
+	batch_2_namespaces = BooleanField(
+		'Does this file use XML namespaces?',
+		default=False
+		)
 	# batch_3 = FileField('File 3',validators=[FileAllowed(['json','csv','pdf'])])
+
 	submit = wtforms.SubmitField('Submit')

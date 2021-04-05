@@ -29,11 +29,11 @@ def start_session():
 	"""
 	form = FileUploadForm()
 	if form.validate_on_submit():
+		print(request.form)
 		session_id = batch_processing.create_session(current_user.id)
 		batch_processing.process_batches(session_id,request)
 		batch_processing.read_files(session_id)
 
-		# flash('You have successfully deleted the session.')
 		return redirect(url_for('compare.list_sessions'))
 
 	return render_template(

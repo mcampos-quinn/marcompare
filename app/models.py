@@ -69,6 +69,7 @@ class Session(db.Model):
 		db.DateTime,
 		default=datetime.datetime.utcnow
 		)
+	notes = db.Column(db.Text)
 	overall_batch_comparison_dict = db.Column(db.Text)
 	author_batch_comparison_dict = db.Column(db.Text)
 	title_batch_comparison_dict = db.Column(db.Text)
@@ -99,6 +100,8 @@ class Batch(db.Model):
 		)
 	source = db.Column(db.String(200))
 	filepath = db.Column(db.String(200))
+	identifier_field = db.Column(db.String(10))
+	namespaces = db.Column(db.Boolean())
 
 	records_tally = db.Column(db.Integer)
 	records_w_more_fields = db.Column(db.Integer)
@@ -123,7 +126,7 @@ class Record(db.Model):
 		nullable=False
 		)
 	title = db.Column(db.Text)
-	oclc_number = db.Column(db.String(200))
+	oclc_number = db.Column(db.String(50))
 	# this is the id of the record containing a matching oclc number
 	oclc_match_id = db.Column(db.Integer)
 	raw_record = db.Column(db.Text)

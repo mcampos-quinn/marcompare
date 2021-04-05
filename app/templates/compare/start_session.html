@@ -3,13 +3,65 @@
 {% extends "base.html" %}
 {% block title %}Start session{% endblock %}
 {% block content %}
-<div class="card text-center mx-auto w-75">
-	<br/>
-	{{ utils.flashed_messages() }}
-	<h1>Upload files to compare</h1>
-	<br/>
-	<div class="card-body">
-		{{ wtf.quick_form(form) }}
+<div class="card">
+	<div class="card-body mx-auto">
+		{{ utils.flashed_messages() }}
+		<h1>Upload files to compare</h1>
+		<hr>
+		<form class="" action="" enctype="multipart/form-data" method="POST" role="form">
+			{{ form.hidden_tag() }}
+			<div class="form-group row">
+				{{ form.batch_1.label(class="col-sm-3 col-form-label") }}
+				<div class="col-sm-9">
+					{{ form.batch_1(class="form-control-file ") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.batch_1_source.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.batch_1_source(class="form-control",placeholder="Where is this batch from?") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.batch_1_identifier_field.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.batch_1_identifier_field(class="custom-select") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.batch_1_namespaces.label(class="col-sm-8 col-form-label") }}
+				<div class="col-sm-4">
+					{{ form.batch_1_namespaces(class="form-check-input") }}
+				</div>
+			</div>
+			<hr>
+			<div class="form-group row">
+				{{ form.batch_2.label(class="col-sm-3 col-form-label") }}
+				<div class="col-sm-9">
+					{{ form.batch_2(class="form-control-file ") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.batch_2_source.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.batch_2_source(class="form-control",placeholder="Where is this batch from?") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.batch_2_identifier_field.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.batch_2_identifier_field(class="custom-select") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.batch_2_namespaces.label(class="col-sm-8 col-form-label") }}
+				<div class="col-sm-4">
+					{{ form.batch_2_namespaces(class="form-check-input") }}
+				</div>
+			</div>
+			<hr>
+			{{ form.submit(class="btn btn-primary")}}
+		</form>
 	</div>
 </div>
 {% endblock %}

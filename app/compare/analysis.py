@@ -356,11 +356,11 @@ def compare_records(row_dict):
 
 	# now do the field matching
 	row_counter = 1
-	matched_fields = []
+	matched_fields = {'field string data':'integer record id'}
 	num_records = len(row_dict['records'])
 	rows = []
 	for field in fields_list:
-		if not field in matched_fields:
+		if not ((str(field) in matched_fields) and (field['data']['record_id'] == matched_fields[str(field)])):
 		# check that the field hasn't already been matched
 			# if not any([i for i in rows if field in i['fields']]):
 			row = {
@@ -375,18 +375,19 @@ def compare_records(row_dict):
 			]
 			if matched_tags != []:
 				for f in matched_tags:
-					if f['data']['text'] == field['data']['text']:
-						row['fields'][f['column']] = f
-						matched_fields.append(f)
-						row['fields'][field['column']] = field
-						matched_fields.append(field)
-					else:
-						f['color'] = 'yellow'
-						field['color'] = 'yellow'
-						row['fields'][f['column']] = f
-						matched_fields.append(f)
-						row['fields'][field['column']] = field
-						matched_fields.append(field)
+					if not ((str(field) in matched_fields) and (field['data']['record_id'] == matched_fields[str(field)])):
+						if f['data']['text'] == field['data']['text']:
+							row['fields'][f['column']] = f
+							matched_fields[str(f)] = f['data']['record_id']
+							row['fields'][field['column']] = field
+							matched_fields[str(field)] = field['data']['record_id']
+						else:
+							f['color'] = 'yellow'
+							field['color'] = 'yellow'
+							row['fields'][f['column']] = f
+							matched_fields[str(f)] = f['data']['record_id']
+							row['fields'][field['column']] = field
+							matched_fields[str(field)] = field['data']['record_id']
 
 			if matched_tags == []:
 				other_column = [
@@ -397,24 +398,24 @@ def compare_records(row_dict):
 				row['fields'][field['column']] = field
 				row['fields'][other_column] = empty_field
 				row['fields'][other_column]['column'] = other_column
-				matched_fields.append(field)
+				matched_fields[str(field)] = field['data']['record_id']
 
 			rows.append(row)
 			row_counter +=1
 
 	# print(matched_fields)
 	for row in rows:
-		print(row)
+		# print(row)
 		for i,f in enumerate(row['fields']):
-			print(f)
+			# print(f)
 			if f == None:
 				row['fields'][i] = empty_field
-				print(empty_field)
+				# print(empty_field)
 		# row['fields'] = [empty_field if x == None else x for x in row['fields']]
 	compare_dict['rows'] = rows
 
 	# sort the rows by field tag giving precedence to the
-	# reocrd with the most fields
+	# record with the most fields
 	cols = []
 	for row in compare_dict['rows']:
 		for field in row['fields']:
