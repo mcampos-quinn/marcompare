@@ -356,13 +356,12 @@ def compare_records(row_dict):
 
 	# now do the field matching
 	row_counter = 1
-	matched_fields = {'field string data':'integer record id'}
+	matched_fields = []
 	num_records = len(row_dict['records'])
 	rows = []
 	for field in fields_list:
-		if not ((str(field) in matched_fields) and (field['data']['record_id'] == matched_fields[str(field)])):
+		if not str(field) in matched_fields:
 		# check that the field hasn't already been matched
-			# if not any([i for i in rows if field in i['fields']]):
 			row = {
 				'row':row_counter,
 				'fields':[None for i in range(num_records)]
@@ -371,23 +370,24 @@ def compare_records(row_dict):
 			matched_tags = [
 				f for f in fields_list \
 				if f['column'] != field['column'] and \
-				f['data']['tag'] == field['data']['tag']
+				f['data']['tag'] == field['data']['tag'] and not \
+				str(f) in matched_fields
 			]
 			if matched_tags != []:
 				for f in matched_tags:
-					if not ((str(field) in matched_fields) and (field['data']['record_id'] == matched_fields[str(field)])):
+					if not str(field) in matched_fields:
 						if f['data']['text'] == field['data']['text']:
 							row['fields'][f['column']] = f
-							matched_fields[str(f)] = f['data']['record_id']
+							matched_fields.append(str(f))
 							row['fields'][field['column']] = field
-							matched_fields[str(field)] = field['data']['record_id']
+							matched_fields.append(str(field))
 						else:
 							f['color'] = 'yellow'
 							field['color'] = 'yellow'
 							row['fields'][f['column']] = f
-							matched_fields[str(f)] = f['data']['record_id']
+							matched_fields.append(str(f))
 							row['fields'][field['column']] = field
-							matched_fields[str(field)] = field['data']['record_id']
+							matched_fields.append(str(field))
 
 			if matched_tags == []:
 				other_column = [
@@ -398,7 +398,7 @@ def compare_records(row_dict):
 				row['fields'][field['column']] = field
 				row['fields'][other_column] = empty_field
 				row['fields'][other_column]['column'] = other_column
-				matched_fields[str(field)] = field['data']['record_id']
+				matched_fields.append(str(field))
 
 			rows.append(row)
 			row_counter +=1
