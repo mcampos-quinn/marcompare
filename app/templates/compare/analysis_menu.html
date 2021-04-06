@@ -13,8 +13,23 @@
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare', id=id) }}">
 		      Overview batch comparison
 		    </a>
+				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_author', id=id) }}">
+		      Subject (1xx) batch comparison
+		    </a>
+				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_title', id=id) }}">
+		      Subject (2xx) batch comparison
+		    </a>
+				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_physical', id=id) }}">
+		      Subject (3xx) batch comparison
+		    </a>
+				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_notes', id=id) }}">
+		      Subject (5xx) batch comparison
+		    </a>
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_subjects', id=id) }}">
 		      Subject (6xx) batch comparison
+		    </a>
+				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_added_author', id=id) }}">
+		      Subject (7xx) batch comparison
 		    </a>
 			</div>
 		{% else %}

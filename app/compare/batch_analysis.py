@@ -170,8 +170,37 @@ def compare_batches(current_session_id):
 		db.session.commit()
 		return comparison_dict
 
-def batch_compare_subjects(current_session_id):
+field_set_criteria = {
+	"1xx":{
+		'field count':'author_field_count',
+		'comparison dict':'author_batch_comparison_dict'
+	},
+	"2xx":{
+		'field count':'title_field_count',
+		'comparison dict':'title_batch_comparison_dict'
+	},
+	"3xx":{
+		'field count':'physical_field_count',
+		'comparison dict':'physical_batch_comparison_dict'
+	},
+	"5xx":{
+		'field count':'note_field_count',
+		'comparison dict':'note_batch_comparison_dict'
+	},
+	"6xx":{
+		'field count':'subject_field_count',
+		'comparison dict':'subject_batch_comparison_dict'
+	},
+	"7xx":{
+		'field count':'added_author_field_count',
+		'comparison dict':'added_author_batch_comparison_dict'
+	}
+}
+
+def batch_compare_field_set(current_session_id,field_set):
 	hookup = DB_Hookup()
+	field_set_count = field_set_criteria[field_set]['field count']
+	stored_comparison_dict = field_set_criteria[field_set]['comparison dict']
 
 	comparison_dict, my_batches, batch_ids = get_session_batches(current_session_id)
 	# print(comparison_dict)
@@ -199,7 +228,7 @@ def batch_compare_subjects(current_session_id):
 				record_dict['color'] = None
 				record_dict['oclc_match'] = row.oclc_match_id
 				# print('oclc match from subj '+str(record_dict['oclc_match']))
-				record_dict['subject_field_count'] = row.subject_field_count
+				record_dict[field_set_count] = row[field_set_count]
 				# comparison_dict['batches'][row.batch_id]['records'].append(
 				# 	record_dict
 				# )
@@ -216,10 +245,10 @@ def batch_compare_subjects(current_session_id):
 				if not oclc_match == []:
 					print(oclc_match)
 					oclc_match = oclc_match[0]
-					if oclc_match['subject_field_count'] > _record["subject_field_count"]:
+					if oclc_match[field_set_count] > _record[field_set_count]:
 						_record['color'] = 'red'
 						oclc_match['color'] = 'green'
-					elif oclc_match['subject_field_count'] < _record["subject_field_count"]:
+					elif oclc_match[field_set_count] < _record[field_set_count]:
 						_record['color'] = 'green'
 						oclc_match['color'] = 'red'
 	session_timestamp = get_session_timestamp(current_session_id)
@@ -241,7 +270,7 @@ def batch_compare_subjects(current_session_id):
 				'record_ids':[],
 				'records':[]
 			}
-			row_record = build_field_comparison_dict(_record,'subject_field_count')
+			row_record = build_field_comparison_dict(_record,field_set_count)
 			row['records'].append(row_record)
 			row['record_ids'].append(_record['id'])
 			# @fixme this result list includes records
@@ -250,7 +279,7 @@ def batch_compare_subjects(current_session_id):
 			# for item in _match:
 			for item in _match:
 				# if not item['data']['batch_id'] == _record['data']['batch_id']:
-				i = build_field_comparison_dict(item,'subject_field_count')
+				i = build_field_comparison_dict(item,field_set_count)
 				row['records'].append(i)
 				row['record_ids'].append(item['id'])
 				matched_records.append(item)
@@ -262,19 +291,19 @@ def batch_compare_subjects(current_session_id):
 
 	# print(compare)
 	_session = Session.query.get(current_session_id)
-	_session.subject_batch_comparison_dict = str(compare)
+	_session[stored_comparison_dict] = str(compare)
 	db.session.commit()
 	return compare
 
 def build_field_comparison_dict(record,field_set_count):
-	# field_set_count should be e.g. record['subject_field_count']
+	# field_set_count should be e.g. record[field_set_count]
 	record_dict = {
 			'id':record['id'],
 			'data':{
 				'batch_id':record['batch_id'],
 				'title':record['title'],
 				'color':record['color'],
-				'subject_field_count':record[field_set_count],
+				field_set_count:record[field_set_count],
 				'oclc_match_id':record['oclc_match']
 			}
 		}

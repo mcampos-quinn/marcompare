@@ -7,7 +7,7 @@
 	{{ utils.flashed_messages() }}
 	<br/>
   <div class="card-body text-center">
-		<h1>Subject (6xx field) batch analysis for session starting {{ session_dict['session_timestamp'] }}</h1>
+		<h1>{{ field_set_label }} ({{ field_set }}) field batch analysis for session starting {{ session_dict['session_timestamp'] }}</h1>
 		<a href="{{ url_for('compare.analysis_menu', id=id) }}">Back to analysis menu for session {{ id }}</a>
     <hr>
 		{% if session_dict['batches'] != [] %}
@@ -47,12 +47,12 @@
 								{% for record in row['records'] %}
 									{% if record['data']['color'] == 'green' %}
 										<td class="table-success">
-											Record <b>{{ record['id'] }}</b> has <b>{{ record['data']['subject_field_count'] }} 6xx fields</b>.<br>
+											Record <b>{{ record['id'] }}</b> has <b>{{ record['data'][field_set_count] }} {{ field_set }} fields</b>.<br>
 											{{ record['data']['title'] }}
 			              </td>
 									{% elif record['data']['color'] == 'red' %}
 										<td class="table-danger">
-											Record <b>{{ record['id'] }}</b> has <b>{{ record['data']['subject_field_count'] }} 6xx fields</b>.<br>
+											Record <b>{{ record['id'] }}</b> has <b>{{ record['data'][field_set_count] }} {{ field_set }} fields</b>.<br>
 											{{ record['data']['title'] }}
 										</td>
 									{% endif %}
@@ -70,7 +70,7 @@
 							</td>
 							{% for record in row['records'] %}
 								<td>
-									Record <b>{{ record['id'] }}</b> has <b>{{ record['data']['subject_field_count'] }} 6xx fields</b>.<br>
+									Record <b>{{ record['id'] }}</b> has <b>{{ record['data'][field_set_count] }} {{ field_set }} fields</b>.<br>
 									{{ record['data']['title'] }}
 								</td>
 							{% endfor %}
