@@ -78,7 +78,7 @@ class Session(db.Model):
 	subject_batch_comparison_dict = db.Column(db.Text)
 	added_author_batch_comparison_dict = db.Column(db.Text)
 
-	batches = db.relationship('Batch', backref='session', lazy=True)
+	batches = db.relationship('Batch', cascade="all,delete", backref='session', lazy=True)
 
 	def __repr__(self):
 		return '<Session: {}>'.format(self.id)
@@ -166,7 +166,7 @@ class Field(db.Model):
 		db.ForeignKey('records.id'),
 		nullable=False
 		)
-	tag = db.Column(db.String(100))
+	tag = db.Column(db.String(50))
 	indicator_1 = db.Column(db.String(10))
 	indicator_2 = db.Column(db.String(10))
 	text = db.Column(db.Text)
