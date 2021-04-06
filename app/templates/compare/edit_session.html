@@ -1,0 +1,16 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+{% block title %}
+      Edit Department
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h1>Edit Department</h1>
+				<hr>
+        {{ wtf.quick_form(form) }}
+				<hr>
+        <a class="btn btn-danger" href="{{ url_for('compare.list_sessions') }}" role="button">Cancel</a>
+    </div>
+</div>
+{% endblock %}

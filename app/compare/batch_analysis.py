@@ -291,7 +291,7 @@ def batch_compare_field_set(current_session_id,field_set):
 
 	# print(compare)
 	_session = Session.query.get(current_session_id)
-	_session[stored_comparison_dict] = str(compare)
+	setattr(_session,stored_comparison_dict,str(compare))
 	db.session.commit()
 	return compare
 

@@ -2,7 +2,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileRequired, FileAllowed, FileField
 import wtforms
-from wtforms.fields import MultipleFileField, StringField, SelectField, BooleanField
+from wtforms.fields import MultipleFileField, StringField, SelectField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Email
 # from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -12,6 +12,7 @@ class FileUploadForm(FlaskForm):
 	Session upload form
 	tbd: how to handle more than two files
 	'''
+	session_notes = StringField('Session notes')
 	batch_1 = FileField('Batch 1',validators=[FileRequired(),FileAllowed(['json'])])
 	batch_1_source = StringField('Batch source')
 	batch_1_identifier_field = SelectField(
@@ -37,4 +38,12 @@ class FileUploadForm(FlaskForm):
 		)
 	# batch_3 = FileField('File 3',validators=[FileAllowed(['json','csv','pdf'])])
 
-	submit = wtforms.SubmitField('Submit')
+	submit = SubmitField('Submit')
+
+class SessionForm(FlaskForm):
+	"""
+	Form for user to edit a session
+	"""
+	session_notes = StringField('Session notes')
+	# description = StringField('Description', validators=[DataRequired()])
+	submit = SubmitField('Submit')

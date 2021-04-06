@@ -8,7 +8,7 @@ from sqlalchemy.sql import text
 from . import compare
 from . import record_analysis, batch_analysis
 from . import batch_processing
-from . forms import FileUploadForm
+from . forms import FileUploadForm, SessionForm
 
 from .. import db
 from .. models import Batch, Session
@@ -48,7 +48,7 @@ def list_sessions():
 	Render the session list template on the /list_sessions route
 	"""
 	list_sessions_sql = '''
-	SELECT sessions.id, sessions.started_timestamp, GROUP_CONCAT(batches.source, ' ; ') AS sources
+	SELECT sessions.id, sessions.started_timestamp, sessions.notes, GROUP_CONCAT(batches.source, ' ; ') AS sources
 	FROM sessions
 	JOIN batches ON sessions.id=batches.session_id
 	GROUP BY sessions.id, sessions.started_timestamp;
@@ -59,6 +59,32 @@ def list_sessions():
 		'compare/list_sessions.html',
 		title="Your comparison sessions",
 		sessions=sessions
+		)
+
+@compare.route('/edit_session/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_session(id):
+	"""
+	Edit a session
+	"""
+
+	session = Session.query.get_or_404(id)
+	form = SessionForm(obj=session)
+	if form.validate_on_submit():
+		session.notes = form.session_notes.data
+		db.session.commit()
+		flash('You have successfully edited session {}.'.format(id))
+
+		# redirect to the departments page
+		return redirect(url_for('compare.list_sessions'))
+
+	form.session_notes.data = session.notes
+	return render_template(
+		'compare/edit_session.html',
+		action="Edit",
+		form=form,
+		session=session,
+		title="Edit Session"
 		)
 
 @compare.route('/delete_session/<int:id>', methods=['GET', 'POST'])

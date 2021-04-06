@@ -11,6 +11,13 @@
 		<form class="" action="" enctype="multipart/form-data" method="POST" role="form">
 			{{ form.hidden_tag() }}
 			<div class="form-group row">
+				{{ form.session_notes.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.session_notes(class="form-control",placeholder="Brief note about this session") }}
+				</div>
+			</div>
+			<hr>
+			<div class="form-group row">
 				{{ form.batch_1.label(class="col-sm-3 col-form-label") }}
 				<div class="col-sm-9">
 					{{ form.batch_1(class="form-control-file ") }}
@@ -60,6 +67,7 @@
 				</div>
 			</div>
 			<hr>
+
 			{{ form.submit(class="btn btn-primary")}}
 		</form>
 	</div>
