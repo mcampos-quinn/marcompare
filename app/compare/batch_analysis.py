@@ -205,12 +205,13 @@ def batch_compare_subjects(current_session_id):
 				# )
 				records.append(record_dict)
 			del row
-		print(records)
+		# print(records)
 
 		for _record in records:
 			if not _record['color']:
 				oclc_match = [
-					x for x in records if x['oclc_match'] == _record['id']
+					x for x in records if (x['oclc_match'] == _record['id'])
+					# and (x['batch_id'] != _record['batch_id'])
 					]
 				if not oclc_match == []:
 					print(oclc_match)
@@ -237,14 +238,21 @@ def batch_compare_subjects(current_session_id):
 		if not _record in matched_records:
 			row = {
 				'row':row_counter,
+				'record_ids':[],
 				'records':[]
 			}
 			row_record = build_field_comparison_dict(_record,'subject_field_count')
 			row['records'].append(row_record)
+			row['record_ids'].append(_record['id'])
+			# @fixme this result list includes records
+			# that are dupe OCLC records in a system
 			_match = [item for item in records if item['oclc_match'] == _record['id']]
+			# for item in _match:
 			for item in _match:
+				# if not item['data']['batch_id'] == _record['data']['batch_id']:
 				i = build_field_comparison_dict(item,'subject_field_count')
 				row['records'].append(i)
+				row['record_ids'].append(item['id'])
 				matched_records.append(item)
 
 			row['records'].sort(key= lambda x : x['data']['batch_id'])

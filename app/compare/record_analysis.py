@@ -16,7 +16,7 @@ from .. app_utils import get_session_timestamp, get_session_batches
 
 from .db_handling import DB_Hookup
 
-def compare_records(row_dict):
+def compare_records(record_id_list):
 	# this is the row_dict that gets passed:
 	# {'row': 27,
 	# 'session_timestamp':1235,
@@ -25,6 +25,7 @@ def compare_records(row_dict):
 	# 	{'id': 537, 'data': {'batch_id': '16', 'color': None, 'subject_field_count': 3, 'oclc_match_id': 503}}
 	# 	]
 	# }
+	# actually just need record_ids session_id
 	hookup = DB_Hookup()
 
 	get_fields_sql = '''
@@ -79,21 +80,23 @@ def compare_records(row_dict):
 		batches_table = hookup.metadata.tables['batches']
 
 		fields_list = []
-		for record in row_dict['records']:
+		for record in record_id_list:
 			# first grab the basic info for the records in the comparison
-			print(record)
-			record_dict = {'record':record['id'],'column':None,'data':{}}
-			source = Batch.query.get(int(record['data']['batch_id'])).source
+			# print(record)
+			the_record = Record.query.get(record)
+			record_dict = {'record':record,'column':None,'data':{}}
+			source = Batch.query.get(the_record.batch_id).source
 			print(source)
-			record_dict['record'] = record['id']
-			record_dict['column'] = row_dict['records'].index(record)
+			record_dict['record'] = the_record.id
+			record_dict['column'] = record_id_list.index(record)
 			record_dict['data']['batch_source'] = source
-			record_dict['data']['title'] = record['data']['title']
+			record_dict['data']['title'] = the_record.title
 
 			compare_dict['records'].append(record_dict)
 
 			s = fields_table.select().where(
-				fields_table.c.record_id==record['id'])
+				fields_table.c.record_id==the_record.id
+				)
 			fields = connection.execute(s).fetchall()
 			# print(fields)
 
@@ -103,7 +106,7 @@ def compare_records(row_dict):
 					'color': None,
 					'column':record_dict['column'],
 					 'data':{
-					 	'record_id':record['id'],
+					 	'record_id':the_record.id,
 						'tag':field.tag,
 						'ind1':field.indicator_1,
 						'ind2':field.indicator_2,
@@ -113,29 +116,32 @@ def compare_records(row_dict):
 				fields_list.append(
 					field_dict
 				)
-				del field
-			del fields
+				# del field
+			# del fields
 
 	# now do the field matching
 	matched_fields = []
-	num_records = len(row_dict['records'])
+	num_records = len(record_id_list)
+	# print(fields_list)
 	rows = []
 	for field in fields_list:
 		if not str(field) in matched_fields:
-		# check that the field hasn't already been matched
+			# check that the field hasn't already been matched
 			row = {
 				'row':'',
 				'fields':[None for i in range(num_records)]
 			}
 
 			matched_tags = [
-				f for f in fields_list \
-				if f['column'] != field['column'] and \
-				f['data']['tag'] == field['data']['tag'] and not \
-				str(f) in matched_fields
+				f for f in fields_list
+				if f['column'] != field['column'] and
+				f['data']['tag'] == field['data']['tag']
+				# and not str(f) in matched_fields
 			]
 			if matched_tags != []:
 				for f in matched_tags:
+					print(f)
+					# print(field)
 					if not str(field) in matched_fields:
 						if f['data']['text'] == field['data']['text']:
 							row['fields'][f['column']] = f
@@ -151,20 +157,32 @@ def compare_records(row_dict):
 							matched_fields.append(str(field))
 
 			if matched_tags == []:
-				other_column = [
-					x for x in range(num_records) \
+				other_columns = [
+					x for x in range(num_records)
 					if not x == field['column']
-					][0]
+					]
+				print('*** ***')
+				print(other_columns)
+				print('*** ***')
 				field['color'] = 'green'
 				row['fields'][field['column']] = field
-				row['fields'][other_column] = empty_field
-				row['fields'][other_column]['column'] = other_column
-				matched_fields.append(str(field))
+				for other_column in other_columns:
+					row['fields'][other_column] = empty_field
+					row['fields'][other_column]['column'] = other_column
+					matched_fields.append(str(field))
 
+			print(row)
+			intermediate = row['fields']
+			for x in row['fields']:
+				if x == None:
+					index = row['fields'].index(x)
+					intermediate.pop(index)
+					intermediate.insert(index,empty_field)
+			row['fields'] = intermediate
 			# row['row'] is a string that we use to sort the rows
 			# by matched field pairs
 			row['row'] = ''.join([x['data']['tag'] for x in row['fields']])
-			print(row['row'])
+			# print(row['row'])
 			rows.append(row)
 
 	compare_dict['rows'] = rows

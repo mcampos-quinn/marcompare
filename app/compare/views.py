@@ -141,25 +141,26 @@ def batch_compare_subjects(id):
 		id=id
 		)
 
-@compare.route('/record_compare/<row>_<session_id>_<session_timestamp>', methods=['GET','POST'])
+@compare.route('/record_compare/<records>_<session_id>', methods=['GET','POST'])
 @login_required
-def record_compare(row,session_timestamp,session_id):
+def record_compare(records,session_id):
 	"""
 	Render the record comparison template on the /record_compare route
 	this is a comparison of two records that match on OCLC number from a session
 	"""
 	# print("& & "*200)
 	# print(row)
-	row = ast.literal_eval(row)
-	# print(row)
-	row_id = row['row']
-	compare_dict = record_analysis.compare_records(row)
+	records = ast.literal_eval(records)
+	print(records)
+	# record_ids = row
+	# row_id = row['row']
+	compare_dict = record_analysis.compare_records(records)
 
 	return render_template(
 		'compare/record_compare.html',
 		title="Compare records",
 		# session_timestamp=session_timestamp,
 		session_id=session_id,
-		id=row_id,
+		# id=row_id,
 		compare_dict=compare_dict
 		)

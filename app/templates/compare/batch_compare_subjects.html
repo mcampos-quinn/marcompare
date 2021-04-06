@@ -39,9 +39,8 @@
 								<td>
 									<a href="{{ url_for(
 										'compare.record_compare',
-										row=row,
-										session_id=id,
-										session_timestamp=session_dict['session_timestamp_int']) }}">
+										records=row['record_ids'],
+										session_id=id) }}">
 										{{ row['row'] }}
 									</a>
 								</td>
@@ -64,9 +63,8 @@
 							<td>
 								<a href="{{ url_for(
 									'compare.record_compare',
-									row=row,
-									session_id=id,
-									session_timestamp=session_dict['session_timestamp_int']) }}">
+									records=row['record_ids'],
+									session_id=id) }}">
 									{{ row['row'] }}
 								</a>
 							</td>
