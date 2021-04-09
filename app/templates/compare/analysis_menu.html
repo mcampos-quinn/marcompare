@@ -2,13 +2,13 @@
 {% extends "base.html" %}
 {% block title %}Perform an analysis{% endblock %}
 {% block content %}
-<div class="card rainbow-box">
+<div class="card">
 	{{ utils.flashed_messages() }}
-	<div class="card-body text-center">
+	<div class="card-body">
 		{% if id %}
 			{% if session_timestamp %}
-				<h1>analysis menu</h1>
-				<h3>for session starting {{ session_timestamp }}</h3>
+				<h1>Analysis menu</h1>
+				<h1>For session {{ id }}, started {{ session_timestamp }}</h1>
 			{% endif %}
 			<div class="list-group active ">
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare', id=id) }}">

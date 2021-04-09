@@ -6,8 +6,9 @@
 	<br/>
 	{{ utils.flashed_messages() }}
 	<br/>
-  <div class="card-body text-center">
-		<h1>{{ field_set_label }} ({{ field_set }}) field batch analysis for session starting {{ session_dict['session_timestamp'] }}</h1>
+  <div class="card-body">
+		<h1>{{ field_set_label }} ({{ field_set }}) field batch analysis</h1>
+		<h1>For session {{ id }}, started {{ session_dict['session_timestamp'] }}</h1>
 		<a href="{{ url_for('compare.analysis_menu', id=id) }}">Back to analysis menu for session {{ id }}</a>
     <hr>
 		{% if session_dict['batches'] != [] %}
@@ -15,20 +16,19 @@
 				<button type="button" class="btn btn-primary" id="show-all">Show all the records</button>
 				<button type="button" class="btn btn-warning" id ="show-discrepancies">Show only records with discrepancies</button>
 			</div>
-				<!-- <p>{{ session_dict}}</p> -->
-				<!-- <table id="compareTable" class="table table-striped table-bordered"> -->
-				<div class="table-responsive">
+			<hr>
+				<div class="table-responsive table-body">
 				<table
 					data-toggle="table"
 					data-search="true"
 					data-pagination="false">
           <thead>
             <tr>
-							<th width="10%">Compare records</th>
+							<th >Compare records</th>
 							{% set cols = session_dict['batches'] | length %}
 							{% set width = 90/cols | int %}
 							{% for batch in session_dict['batches'] %}
-	              <th width="{{ width }}%"> Batch source: {{ batch['source'] }} </th>
+	              <th > Batch source: {{ batch['source'] }} </th>
 							{% endfor %}
             </tr>
           </thead>

@@ -4,7 +4,7 @@
 {% block title %}Start session{% endblock %}
 {% block content %}
 <div class="card">
-	<div class="card-body mx-auto">
+	<div class="card-body">
 		{{ utils.flashed_messages() }}
 		<h1>Upload files to compare</h1>
 		<hr>
@@ -18,8 +18,8 @@
 			</div>
 			<hr>
 			<div class="form-group row">
-				{{ form.batch_1.label(class="col-sm-3 col-form-label") }}
-				<div class="col-sm-9">
+				{{ form.batch_1.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
 					{{ form.batch_1(class="form-control-file ") }}
 				</div>
 			</div>
@@ -36,15 +36,15 @@
 				</div>
 			</div>
 			<div class="form-group row">
-				{{ form.batch_1_namespaces.label(class="col-sm-8 col-form-label") }}
-				<div class="col-sm-4">
+				{{ form.batch_1_namespaces.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
 					{{ form.batch_1_namespaces(class="form-check-input") }}
 				</div>
 			</div>
 			<hr>
 			<div class="form-group row">
-				{{ form.batch_2.label(class="col-sm-3 col-form-label") }}
-				<div class="col-sm-9">
+				{{ form.batch_2.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
 					{{ form.batch_2(class="form-control-file ") }}
 				</div>
 			</div>
@@ -61,8 +61,8 @@
 				</div>
 			</div>
 			<div class="form-group row">
-				{{ form.batch_2_namespaces.label(class="col-sm-8 col-form-label") }}
-				<div class="col-sm-4">
+				{{ form.batch_2_namespaces.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
 					{{ form.batch_2_namespaces(class="form-check-input") }}
 				</div>
 			</div>

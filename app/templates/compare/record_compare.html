@@ -3,19 +3,19 @@
 {% block title %}Comparing two records{% endblock %}
 {% block content %}
 <div class="card">
-  <div class="card-body text-center">
+  <div class="card-body">
     <br/>
     {{ utils.flashed_messages() }}
     <br/>
     <h1>Side by side comparison of records from session {{ session_id }}</h1>
 		<a href="{{ url_for('compare.analysis_menu', id=session_id)}}">Back to analysis menu for session {{ session_id }}</a>
       <hr>
-			<button class="btn btn-primary" type="button" name="button">
-				<a href="{{ url_for('compare.record_compare_oclc', records=records, session_id=session_id)}}">Add the oclc record</a>
-			</button>
+			<a class="btn btn-primary" href="{{ url_for('compare.record_compare_oclc', records=records, session_id=session_id)}}">
+				Add the oclc record
+			</a>
 			<hr>
 			{% if compare_dict['records'] != [] %}
-				<!-- <p>{{compare_dict}}</p> -->
+			<div class="table-responsive fixed-table-body table-fit">
 				<table
 				data-toggle="table"
 				data-search="true">
@@ -63,7 +63,7 @@
 					{% endfor %}
 					</tbody>
 				</table>
-
+			</div>
 			{% else %}
 			<p>There are no records?? :/</p>
 			{% endif%}

@@ -107,6 +107,7 @@ def parse_json(
 	# print(prefix)
 	with open(batch_filepath,'r') as f:
 		data = json.load(f)
+		print(data)
 		db_records = []
 		with hookup.engine.connect() as connection:
 			for record in data[prefix+'collection'][prefix+'record']:

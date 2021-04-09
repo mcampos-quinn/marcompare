@@ -1,4 +1,4 @@
-.list-group-item {
+.rainbow {
     background: linear-gradient(
         rgba(255, 0, 0, 1) 0%,
         rgba(255, 154, 0, 1) 10%,
@@ -12,4 +12,15 @@
         rgba(251, 7, 217, 1) 90%,
         rgba(255, 0, 0, 1) 100%
     );
+}
+
+table.table-fit {
+    width: auto !important;
+    table-layout: auto !important;
+}
+table.table-fit thead th, table.table-fit tfoot th {
+    width: auto !important;
+}
+table.table-fit tbody td, table.table-fit tfoot td {
+    width: auto !important;
 }
