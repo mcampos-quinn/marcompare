@@ -2,34 +2,35 @@
 {% extends "base.html" %}
 {% block title %}Perform an analysis{% endblock %}
 {% block content %}
-<div class="card">
+<div class="card rainbow-box">
 	{{ utils.flashed_messages() }}
 	<div class="card-body text-center">
 		{% if id %}
 			{% if session_timestamp %}
-			<h3>Analysis Menu for session starting {{ session_timestamp }}</h3>
+				<h1>analysis menu</h1>
+				<h3>for session starting {{ session_timestamp }}</h3>
 			{% endif %}
-			<div class="list-group active">
+			<div class="list-group active ">
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare', id=id) }}">
 		      Overview batch comparison
 		    </a>
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_author', id=id) }}">
-		      Subject (1xx) batch comparison
+		      Author/Creator (1xx) batch comparison
 		    </a>
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_title', id=id) }}">
-		      Subject (2xx) batch comparison
+		      Title/Publisher (2xx) batch comparison
 		    </a>
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_physical', id=id) }}">
-		      Subject (3xx) batch comparison
+		      Physical description (3xx) batch comparison
 		    </a>
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_notes', id=id) }}">
-		      Subject (5xx) batch comparison
+		      Notes (5xx) batch comparison
 		    </a>
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_subjects', id=id) }}">
 		      Subject (6xx) batch comparison
 		    </a>
 				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_added_author', id=id) }}">
-		      Subject (7xx) batch comparison
+		      Added author (7xx) batch comparison
 		    </a>
 			</div>
 		{% else %}

@@ -2,7 +2,7 @@
 
 This is a Flask-based webapp to compare matching MARC bibliographic records coming from (at least?) two different sources. It uses simple comparisons to point to which source has more data, which records are more complete, etc.
 
-~in progress~
+
 
 ## Use case
 
@@ -14,8 +14,18 @@ This tool is designed to help with the analysis of which records should be updat
 
 MARC files are input as JSON files created by MARCEdit. Currently I have a limited set of files to test with, so I'll need to add better handling for different formats of MARC JSON soon (coming from XML in Alma versus for example, MARC files exported from Millennium).
 
+## Dependencies
+
+* Flask and related packages:
+	* `pip3 install flask flask-sqlalchemy flask-wtf flask-login flask-bootstrap flask-migrate sqlalchemy wtforms`
+	* optionally: `flask_debugtoolbar`
+* For OCLC Z39.50 querying (optional?):
+	* MarcEdit
+	* `yaz`
+		* `brew install yaz`
+
 To dos:
 
-* add handling for different MARC JSON formats (i.e. how tags/subfieds are arranged & labeled)
-* add different OCLC number match points (019, 001) and maybe offer a checkbox for each uploaded file for the user to specify where to look for OCLC#?
-* add private/public session distinction? so people can share sets? or to add a "sample" set.
+- [x] add handling for different MARC JSON formats (i.e. how tags/subfieds are arranged & labeled)
+- [x] add different OCLC number match points (019, 001) and maybe offer a checkbox for each uploaded file for the user to specify where to look for OCLC#?
+- [ ] add private/public session distinction? so people can share sets? or to add a "sample" set.

@@ -85,23 +85,37 @@ def read_files(my_session_id):
 			batch.namespaces
 			)
 
-def parse_json(batch_id,batch_filepath,identifier_field,namespaces):
+def parse_json(
+	batch_id,
+	batch_filepath,
+	identifier_field,
+	namespaces,
+	oclc_number=None
+	):
 	# Go thru the batch's JSON and make entries in the db for all
 	# the records and each field
 	if namespaces:
 		prefix = "marc:"
 	else:
 		prefix = ""
+	if oclc_number:
+		# i.e. if this is a batch of 1 record from oclc
+		the_oclc_number = oclc_number
 	hookup = DB_Hookup()
 	print("&& & &"*300)
-	print(prefix)
+	print(batch_filepath)
+	# print(prefix)
 	with open(batch_filepath,'r') as f:
 		data = json.load(f)
 		db_records = []
 		with hookup.engine.connect() as connection:
 			for record in data[prefix+'collection'][prefix+'record']:
+				print("XX XX")
+				print(record)
 				record_dict = {}
 				record_dict['fields'] = []
+				if not batch_id:
+					record_dict['from_oclc'] = True
 				record_dict['batch_id'] = batch_id
 				record_dict['oclc_number'] = None
 				record_dict['title'] = None
@@ -183,6 +197,7 @@ def parse_json(batch_id,batch_filepath,identifier_field,namespaces):
 							record_dict['title'] = data_tag[prefix+'subfield']['#text']
 
 				db_records.append(record_dict)
+				del record
 			# Take out the field list from each record temporarily so we
 			# can insert the records themselves in bulk to the DB (saves A LOT
 			# of processing overhead)
@@ -204,9 +219,20 @@ def parse_json(batch_id,batch_filepath,identifier_field,namespaces):
 			# Go back and retrieve all the record ids in a new dict
 			# Have to do it this way since the bulk INSERT operation
 			# above doesn't return primary keys from the db
-			select_records = select(
-				(records_table.c.id,records_table.c.raw_record)
-				).where(records_table.c.batch_id == batch_id)
+			if batch_id != 0:
+				select_records = select(
+					(records_table.c.id,records_table.c.raw_record)
+					).where(records_table.c.batch_id == batch_id)
+			else:
+				# if it's just a single record from OCLC
+				select_records = select(
+					(records_table.c.id,records_table.c.raw_record)
+					).where(
+						and_(
+							records_table.c.oclc_number == the_oclc_number,
+							records_table.c.from_oclc == True
+							)
+						)
 			result = connection.execute(select_records)
 			record_ids_temp = {}
 			for row in result:

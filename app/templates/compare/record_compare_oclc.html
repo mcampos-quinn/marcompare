@@ -10,10 +10,6 @@
     <h1>Side by side comparison of records from session {{ session_id }}</h1>
 		<a href="{{ url_for('compare.analysis_menu', id=session_id)}}">Back to analysis menu for session {{ session_id }}</a>
       <hr>
-			<button class="btn btn-primary" type="button" name="button">
-				<a href="{{ url_for('compare.record_compare_oclc', records=records, session_id=session_id)}}">Add the oclc record</a>
-			</button>
-			<hr>
 			{% if compare_dict['records'] != [] %}
 				<!-- <p>{{compare_dict}}</p> -->
 				<table

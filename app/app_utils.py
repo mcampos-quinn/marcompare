@@ -3,7 +3,7 @@ import os
 from flask import current_app
 
 from app import db
-from . models import Session, Batch
+from . models import Session, Batch, Record
 
 def clean_temp_folder():
 	temp_folder = current_app.config['UPLOAD_FOLDER']
@@ -27,3 +27,13 @@ def get_session_batches(current_session_id):
 	batch_ids = [str(batch.id) for batch in my_batches]
 
 	return comparison_dict, my_batches, batch_ids
+
+def get_record_oclc_number(record_id):
+	oclc_number = Record.query.get(record_id).oclc_number
+
+	return oclc_number
+
+def check_oclc_main(record_id):
+	has_oclc_main_already = Record.query.get(record_id).oclc_main_record_id
+
+	return has_oclc_main_already

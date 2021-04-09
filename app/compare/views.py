@@ -12,6 +12,7 @@ from . forms import FileUploadForm, SessionForm
 
 from .. import db
 from .. models import Batch, Session
+from .. import app_utils
 from .. app_utils import get_session_timestamp
 
 def check_admin():
@@ -343,6 +344,40 @@ def record_compare(records,session_id):
 
 	return render_template(
 		'compare/record_compare.html',
+		title="Compare records",
+		# session_timestamp=session_timestamp,
+		session_id=session_id,
+		records=records,
+		compare_dict=compare_dict
+		)
+
+@compare.route('/record_compare_oclc/<records>_<session_id>', methods=['GET','POST'])
+@login_required
+def record_compare_oclc(records,session_id):
+	"""
+	Render the record comparison template on the /record_compare route
+	this is a comparison of two records that match on OCLC number from a session
+	"""
+	# print("& & "*200)
+	# print(row)
+	records = ast.literal_eval(records)
+	print(records)
+	# record_ids = row
+	# row_id = row['row']
+	has_oclc_main_already = app_utils.check_oclc_main(records[0])
+	if not has_oclc_main_already:
+		oclc_number = app_utils.get_record_oclc_number(records[0])
+		oclc_main_record_id = record_analysis.pull_oclc(oclc_number)
+	else:
+		oclc_main_record_id = has_oclc_main_already
+	if oclc_main_record_id:
+		records.insert(-1,oclc_main_record_id)
+	else:
+		pass
+	compare_dict = record_analysis.compare_records(records,oclc=True)
+
+	return render_template(
+		'compare/record_compare_oclc.html',
 		title="Compare records",
 		# session_timestamp=session_timestamp,
 		session_id=session_id,

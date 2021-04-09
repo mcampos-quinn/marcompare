@@ -129,6 +129,10 @@ class Record(db.Model):
 	oclc_number = db.Column(db.String(50))
 	# this is the id of the record containing a matching oclc number
 	oclc_match_id = db.Column(db.Integer)
+	# is this record from oclc?
+	from_oclc = db.Column(db.Boolean)
+	# this is the record id for the record pulled down from oclc
+	oclc_main_record_id = db.Column(db.Integer)
 	raw_record = db.Column(db.Text)
 	# all the fields
 	field_count = db.Column(db.Integer)

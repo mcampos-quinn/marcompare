@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import subprocess
 import time
 
 from collections import Counter
@@ -12,29 +13,18 @@ from sqlalchemy.sql import insert, select, update
 import app
 from .. import db
 from .. models import Session, Batch, Record, Field
+from .. import app_utils
 from .. app_utils import get_session_timestamp, get_session_batches
 
 from .db_handling import DB_Hookup
+from .batch_processing import parse_json
 
-def compare_records(record_id_list):
-	# this is the row_dict that gets passed:
-	# {'row': 27,
-	# 'session_timestamp':1235,
-	# 'records': [
-	# 	{'id': 503, 'data': {'batch_id': '15', 'color': None, 'subject_field_count': 3, 'oclc_match_id': 537}},
-	# 	{'id': 537, 'data': {'batch_id': '16', 'color': None, 'subject_field_count': 3, 'oclc_match_id': 503}}
-	# 	]
-	# }
-	# actually just need record_ids session_id
+def compare_records(record_id_list,oclc=None):
 	hookup = DB_Hookup()
-
+	oclc_number = None
 	get_fields_sql = '''
 	fields.record_id=:record_id
 	'''
-	# batch_source_sql = '''
-	# INNER JOIN records
-	# ON batches.id=:record_id;
-	# '''
 	compare_dict = {
 		'records': [
  			{'record':None,
@@ -84,8 +74,12 @@ def compare_records(record_id_list):
 			# first grab the basic info for the records in the comparison
 			# print(record)
 			the_record = Record.query.get(record)
+			oclc_number = the_record.oclc_number
 			record_dict = {'record':record,'column':None,'data':{}}
-			source = Batch.query.get(the_record.batch_id).source
+			if the_record.batch_id != 0:
+				source = Batch.query.get(the_record.batch_id).source
+			else:
+				source = "OCLC"
 			print(source)
 			record_dict['record'] = the_record.id
 			record_dict['column'] = record_id_list.index(record)
@@ -122,6 +116,9 @@ def compare_records(record_id_list):
 	# now do the field matching
 	matched_fields = []
 	num_records = len(record_id_list)
+	if oclc:
+		num_records = num_records + 1
+
 	# print(fields_list)
 	rows = []
 	for field in fields_list:
@@ -192,3 +189,79 @@ def compare_records(record_id_list):
 
 	# print(compare_dict)
 	return compare_dict
+
+def pull_oclc(oclc_number):
+	# do a z39.50 query to get the current OCLC main record
+	output = None
+	marcedit_path = current_app.config['MARCEDIT_BINARY_PATH']
+	oclc_z3950_auth = current_app.config['OCLC_Z3950_AUTH']
+	# marcedit_path = current_app.config['MARCEDIT_BINARY_PATH']
+	tmp_path = current_app.config['UPLOAD_FOLDER']
+	yaz_commands_path = os.path.join(tmp_path,'yaz_commands.txt')
+	yaz_oclc_record_marc_path = os.path.join(tmp_path,'yaz_oclc_record.mrc')
+	yaz_oclc_record_xml_path = os.path.join(tmp_path,'yaz_oclc_record.xml')
+	yaz_oclc_record_json_path = os.path.join(tmp_path,'yaz_oclc_record.json')
+	yaz_commands_temp_path = yaz_commands_path.replace('yaz_commands','yaz_commands_temp')
+	with open(yaz_commands_path,'r') as f:
+		# store the original commands to return the file to its previous state
+		yaz_command_original = f.read()
+		# get the commands for yaz to query OCLC using the current oclc number
+		yaz_command = yaz_command_original.format(oclc_z3950_auth,oclc_number)
+	with open(yaz_commands_temp_path,'w') as f:
+		f.write(yaz_command)
+	command = [
+		'yaz-client',
+		'-f',os.path.join(tmp_path,'yaz_commands_temp.txt'),
+		'-m',yaz_oclc_record_marc_path
+		]
+	yaz_output = subprocess.run(command,stdout=subprocess.PIPE)
+	os.remove(yaz_commands_temp_path)
+
+	if b"Search was a success" in yaz_output.stdout:
+		# do an annoying back and forth w MARCEdit to get the record in
+		# the correct XML/JSON formats
+		to_xml_command = [
+			marcedit_path,
+			'-s',yaz_oclc_record_marc_path,
+			'-d',yaz_oclc_record_xml_path,
+			'-marcxml'
+		]
+		subprocess.run(to_xml_command)
+		to_json_command = [
+			marcedit_path,
+			'-s',yaz_oclc_record_xml_path,
+			'-d',yaz_oclc_record_json_path,
+			'-xml2json'
+		]
+		subprocess.run(to_json_command)
+
+		parse_json(
+			0,
+			os.path.join(tmp_path,'yaz_oclc_record.json'),
+			'001',
+			True,
+			oclc_number=oclc_number
+			)
+		oclc_main_record = db.session.query(Record).filter(
+			Record.from_oclc == True,
+			Record.oclc_number == oclc_number
+			).first()
+		oclc_main_record_id = oclc_main_record.id
+		matching_records = db.session.query(Record).filter(
+			Record.oclc_number == oclc_number
+		)
+		for record in matching_records:
+			record.oclc_main_record_id = oclc_main_record_id
+		db.session.commit()
+
+	else:
+		# the search failed?
+		outcome = False
+	with open(yaz_oclc_record_xml_path,'w') as x, \
+		open(yaz_oclc_record_json_path,'w') as j, \
+		open(yaz_oclc_record_marc_path,'w') as m:
+		m.truncate(0)
+		j.truncate(0)
+		x.truncate(0)
+
+	return oclc_main_record_id
