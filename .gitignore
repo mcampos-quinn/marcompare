@@ -12,3 +12,4 @@ htmlcov
 config.py
 tmp/
 !tmp/.keep
+!tmp/yaz_*

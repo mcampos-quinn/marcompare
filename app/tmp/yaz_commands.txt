@@ -1,0 +1,7 @@
+authentication {}
+open zcat.oclc.org:210/OLUCWorldCat
+find @attr 1=12 @attr 5=100 "{}"
+format usmarc
+show 1
+close
+quit

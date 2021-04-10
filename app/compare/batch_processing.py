@@ -110,95 +110,26 @@ def parse_json(
 		print(data)
 		db_records = []
 		with hookup.engine.connect() as connection:
-			for record in data[prefix+'collection'][prefix+'record']:
-				print("XX XX")
-				print(record)
-				record_dict = {}
-				record_dict['fields'] = []
-				if not batch_id:
-					record_dict['from_oclc'] = True
-				record_dict['batch_id'] = batch_id
-				record_dict['oclc_number'] = None
-				record_dict['title'] = None
-				# record_dict['record_id'] = None # we'll get this id later
-				record_dict['raw_record'] = str(record)
-				# get the count of data fields
-				record_dict['field_count'] = len(record[prefix+'datafield'])
-				# get 1xx count
-				record_dict['author_field_count'] = len(
-					[x for x in record[prefix+'datafield'] if x['@tag'].startswith('1')]
-					)
-				# get 2xx count
-				record_dict['title_field_count'] = len(
-					[x for x in record[prefix+'datafield'] if x['@tag'].startswith('2')]
-					)
-				# get 3xx count
-				record_dict['physical_field_count'] = len(
-					[x for x in record[prefix+'datafield'] if x['@tag'].startswith('3')]
-					)
-				# get 5xx count
-				record_dict['note_field_count'] = len(
-					[x for x in record[prefix+'datafield'] if x['@tag'].startswith('5')]
-					)
-				# get 6xx count
-				record_dict['subject_field_count'] = len(
-					[x for x in record[prefix+'datafield'] if x['@tag'].startswith('6')]
-					)
-				# get 7xx count
-				record_dict['added_author_field_count'] = len(
-					[x for x in record[prefix+'datafield'] if x['@tag'].startswith('7')]
-					)
-				# get 856 count
-				record_dict['link_field_count'] = len(
-					[x for x in record[prefix+'datafield'] if x['@tag'] == '856']
-					)
-				# Loop thru all the control fields and grab data
-				for control_tag in record[prefix+'controlfield']:
-					tag_dict = {}
-					tag_dict['tag'] = control_tag['@tag']
-					tag_dict['indicator_1'] = None
-					tag_dict['indicator_2'] = None
-					tag_dict['text'] =  control_tag['#text'].lstrip('0')
-
-					record_dict['fields'].append(tag_dict)
-					# Now look for an OCLC number
-					if identifier_field == '001':
-						if control_tag['@tag'] == '001':
-							record_dict['oclc_number'] = re.sub(r"\D", "", control_tag['#text']).lstrip('0')
-
-				# Loop thru all the data fields and grab data
-				for data_tag in record[prefix+'datafield']:
-					tag_dict = {}
-					tag_dict['tag'] = data_tag['@tag']
-					tag_dict['indicator_1'] = data_tag['@ind1']
-					tag_dict['indicator_2'] = data_tag['@ind2']
-					tag_dict['text'] =  parse_subfields(data_tag[prefix+'subfield'])
-
-					record_dict['fields'].append(tag_dict)
-					# Now look for an OCLC number
-					if identifier_field == '035':
-						if data_tag['@tag'] == '035':
-							oclc_number = None
-							if isinstance(data_tag[prefix+'subfield'],list):
-								for sf in data_tag[prefix+'subfield']:
-									if sf['@code'] == 'a' and 'OCoLC' in sf['#text']:
-										record_dict['oclc_number'] = re.sub(r"\D", "", sf['#text']).lstrip('0')
-							elif isinstance(data_tag[prefix+'subfield'],dict):
-								if data_tag[prefix+'subfield']['@code'] == 'a' \
-									and 'OCoLC' in data_tag[prefix+'subfield']['#text']:
-									record_dict['oclc_number'] = re.sub(r"\D", "", data_tag[prefix+'subfield']['#text']).lstrip('0')
-
-					# look for a 245 to be "title"
-					if data_tag['@tag'] == '245':
-						title = None
-						if isinstance(data_tag[prefix+'subfield'],list):
-							title = ' '.join([sf['#text'] for sf in data_tag[prefix+'subfield']])
-							record_dict['title'] = title
-						elif isinstance(data_tag[prefix+'subfield'],dict):
-							record_dict['title'] = data_tag[prefix+'subfield']['#text']
-
+			if isinstance(data[prefix+'collection'][prefix+'record'],dict):
+				record_dict = parse_record(
+					data[prefix+'collection'][prefix+'record'],
+					prefix,
+					batch_id,
+					identifier_field
+				)
 				db_records.append(record_dict)
-				del record
+
+			elif isinstance(data[prefix+'collection'][prefix+'record'],list):
+				for record in data[prefix+'collection'][prefix+'record']:
+					record_dict = parse_record(
+						record,
+						prefix,
+						batch_id,
+						identifier_field
+					)
+					db_records.append(record_dict)
+					del record
+
 			# Take out the field list from each record temporarily so we
 			# can insert the records themselves in bulk to the DB (saves A LOT
 			# of processing overhead)
@@ -268,6 +199,95 @@ def chunker(iterable, n, fillvalue=None):
 	# bib records the number of fields can easily go way past that.
 	# taken from https://codereview.stackexchange.com/questions/161889/iterate-through-python-iterable-in-chunk-of-n
     yield from itertools.zip_longest(*[iter(iterable)] * n, fillvalue=fillvalue)
+
+def parse_record(record,prefix,batch_id,identifier_field):
+	print("XX XX")
+	print(record)
+	record_dict = {}
+	record_dict['fields'] = []
+	if not batch_id:
+		record_dict['from_oclc'] = True
+	record_dict['batch_id'] = batch_id
+	record_dict['oclc_number'] = None
+	record_dict['title'] = None
+	# record_dict['record_id'] = None # we'll get this id later
+	record_dict['raw_record'] = str(record)
+	# get the count of data fields
+	record_dict['field_count'] = len(record[prefix+'datafield'])
+	# get 1xx count
+	record_dict['author_field_count'] = len(
+		[x for x in record[prefix+'datafield'] if x['@tag'].startswith('1')]
+		)
+	# get 2xx count
+	record_dict['title_field_count'] = len(
+		[x for x in record[prefix+'datafield'] if x['@tag'].startswith('2')]
+		)
+	# get 3xx count
+	record_dict['physical_field_count'] = len(
+		[x for x in record[prefix+'datafield'] if x['@tag'].startswith('3')]
+		)
+	# get 5xx count
+	record_dict['note_field_count'] = len(
+		[x for x in record[prefix+'datafield'] if x['@tag'].startswith('5')]
+		)
+	# get 6xx count
+	record_dict['subject_field_count'] = len(
+		[x for x in record[prefix+'datafield'] if x['@tag'].startswith('6')]
+		)
+	# get 7xx count
+	record_dict['added_author_field_count'] = len(
+		[x for x in record[prefix+'datafield'] if x['@tag'].startswith('7')]
+		)
+	# get 856 count
+	record_dict['link_field_count'] = len(
+		[x for x in record[prefix+'datafield'] if x['@tag'] == '856']
+		)
+	# Loop thru all the control fields and grab data
+	for control_tag in record[prefix+'controlfield']:
+		tag_dict = {}
+		tag_dict['tag'] = control_tag['@tag']
+		tag_dict['indicator_1'] = None
+		tag_dict['indicator_2'] = None
+		tag_dict['text'] =  control_tag['#text'].lstrip('0')
+
+		record_dict['fields'].append(tag_dict)
+		# Now look for an OCLC number
+		if identifier_field == '001':
+			if control_tag['@tag'] == '001':
+				record_dict['oclc_number'] = re.sub(r"\D", "", control_tag['#text']).lstrip('0')
+
+	# Loop thru all the data fields and grab data
+	for data_tag in record[prefix+'datafield']:
+		tag_dict = {}
+		tag_dict['tag'] = data_tag['@tag']
+		tag_dict['indicator_1'] = data_tag['@ind1']
+		tag_dict['indicator_2'] = data_tag['@ind2']
+		tag_dict['text'] =  parse_subfields(data_tag[prefix+'subfield'])
+
+		record_dict['fields'].append(tag_dict)
+		# Now look for an OCLC number
+		if identifier_field == '035':
+			if data_tag['@tag'] == '035':
+				oclc_number = None
+				if isinstance(data_tag[prefix+'subfield'],list):
+					for sf in data_tag[prefix+'subfield']:
+						if sf['@code'] == 'a' and 'OCoLC' in sf['#text']:
+							record_dict['oclc_number'] = re.sub(r"\D", "", sf['#text']).lstrip('0')
+				elif isinstance(data_tag[prefix+'subfield'],dict):
+					if data_tag[prefix+'subfield']['@code'] == 'a' \
+						and 'OCoLC' in data_tag[prefix+'subfield']['#text']:
+						record_dict['oclc_number'] = re.sub(r"\D", "", data_tag[prefix+'subfield']['#text']).lstrip('0')
+
+		# look for a 245 to be "title"
+		if data_tag['@tag'] == '245':
+			title = None
+			if isinstance(data_tag[prefix+'subfield'],list):
+				title = ' '.join([sf['#text'] for sf in data_tag[prefix+'subfield']])
+				record_dict['title'] = title
+			elif isinstance(data_tag[prefix+'subfield'],dict):
+				record_dict['title'] = data_tag[prefix+'subfield']['#text']
+
+	return record_dict
 
 def parse_subfields(_subfield):
 	_list = []

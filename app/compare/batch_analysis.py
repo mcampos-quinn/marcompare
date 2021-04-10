@@ -158,7 +158,6 @@ def compare_batches(current_session_id):
 		# parse the batches into a dict for comparison
 		for _batch in my_batches:
 			batch_dict = {}
-			# comparison_dict[_batch.id] = {}
 			batch_dict['source'] = _batch.source
 			batch_dict['records tally'] = _batch.records_tally
 			batch_dict['records w more fields'] = _batch.records_w_more_fields
@@ -204,6 +203,23 @@ def batch_compare_field_set(current_session_id,field_set):
 
 	comparison_dict, my_batches, batch_ids = get_session_batches(current_session_id)
 	# print(comparison_dict)
+	session_timestamp = get_session_timestamp(current_session_id)
+	batches = []
+	for b in my_batches:
+		# make a list of dicts representing each batch
+		d = {
+			'id':b.id,
+			'source':b.source,
+			'column':my_batches.index(b),
+			'colspan':None
+			}
+		batches.append(d)
+	compare = {
+		'batches':batches,
+		'session_timestamp': session_timestamp,
+		'session_timestamp_int': re.sub(r"\D", "", session_timestamp),
+		'rows':[{'row':0,'records':[]}]}
+
 	with hookup.engine.connect() as connection:
 		batch_records_sql = '''
 		records.batch_id IN :batch_ids
@@ -213,29 +229,25 @@ def batch_compare_field_set(current_session_id,field_set):
 			bindparam('batch_ids',expanding=True)
 			)
 		s = records_table.select(t)
+		# this returns all the records that are in the set of batch ids
 		result = connection.execute(s,{'batch_ids':batch_ids})
 
 		records = []
-		for row in result:
-			if row.oclc_match_id:
-				# print(row.oclc_match_id)
-				# print(row.id)
+		for item in result:
+			if item.oclc_match_id:
+				# only include records with an OCLC match
 				record_dict = {}
-				record_dict['id'] = row.id
-				record_dict['title'] = row.title
-				record_dict['batch_id'] = str(row.batch_id) # this is a string in the batch_ids list
-				# record_dict['batch_source'] = str(row.batch_source)
+				record_dict['id'] = item.id
+				record_dict['title'] = item.title
+				record_dict['batch_id'] = str(item.batch_id) # this is a string in the batch_ids list
+				record_dict['column'] = [x['column'] for x in batches if x['id'] == item.batch_id][0]
 				record_dict['color'] = None
-				record_dict['oclc_match'] = row.oclc_match_id
+				record_dict['oclc_match'] = item.oclc_match_id
 				# print('oclc match from subj '+str(record_dict['oclc_match']))
-				record_dict[field_set_count] = row[field_set_count]
-				# comparison_dict['batches'][row.batch_id]['records'].append(
-				# 	record_dict
-				# )
+				record_dict[field_set_count] = item[field_set_count]
 				records.append(record_dict)
-			del row
+			del item
 		# print(records)
-
 		for _record in records:
 			if not _record['color']:
 				oclc_match = [
@@ -251,16 +263,7 @@ def batch_compare_field_set(current_session_id,field_set):
 					elif oclc_match[field_set_count] < _record[field_set_count]:
 						_record['color'] = 'green'
 						oclc_match['color'] = 'red'
-	session_timestamp = get_session_timestamp(current_session_id)
-	batches = []
-	for b in my_batches:
-		d = {'id':b.id,'source':b.source}
-		batches.append(d)
-	compare = {
-		'batches':batches,
-		'session_timestamp': session_timestamp,
-		'session_timestamp_int': re.sub(r"\D", "", session_timestamp),
-		'rows':[{'row':0,'records':[]}]}
+
 	row_counter = 1
 	matched_records = []
 	for _record in records:
@@ -289,6 +292,19 @@ def batch_compare_field_set(current_session_id,field_set):
 			compare['rows'].append(row)
 			row_counter += 1
 
+	columns = [i for i in range(len(my_batches))]
+	# print(compare['rows'])
+	for x in columns:
+		counts = []
+		for row in compare['rows']:
+			# print(row['records'])
+			count = [r['column'] for r in row['records']].count(x)
+			counts.append(count)
+		colspan = max(counts)
+		for batch in batches:
+			if batch['column'] == x:
+				batch['colspan'] = colspan
+
 	# print(compare)
 	_session = Session.query.get(current_session_id)
 	setattr(_session,stored_comparison_dict,str(compare))
@@ -299,6 +315,7 @@ def build_field_comparison_dict(record,field_set_count):
 	# field_set_count should be e.g. record[field_set_count]
 	record_dict = {
 			'id':record['id'],
+			'column':record['column'],
 			'data':{
 				'batch_id':record['batch_id'],
 				'title':record['title'],

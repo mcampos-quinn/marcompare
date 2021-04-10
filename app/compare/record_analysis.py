@@ -116,9 +116,12 @@ def compare_records(record_id_list,oclc=None):
 	# now do the field matching
 	matched_fields = []
 	num_records = len(record_id_list)
-	if oclc:
-		num_records = num_records + 1
+	multi_record = None
+	if num_records > 2:
+		multi_record = True
 
+	# print("** ** ** "*200)
+	# print(multi_record)
 	# print(fields_list)
 	rows = []
 	for field in fields_list:
@@ -129,38 +132,46 @@ def compare_records(record_id_list,oclc=None):
 				'fields':[None for i in range(num_records)]
 			}
 
-			matched_tags = [
-				f for f in fields_list
-				if f['column'] != field['column'] and
-				f['data']['tag'] == field['data']['tag']
-				# and not str(f) in matched_fields
-			]
+			if multi_record:
+				matched_tags = [
+					f for f in fields_list
+					if f['column'] != field['column'] and
+					f['data']['tag'] == field['data']['tag']
+					and not str(f) in matched_fields
+				]
+			else:
+				matched_tags = [
+					f for f in fields_list
+					if f['column'] != field['column'] and
+					f['data']['tag'] == field['data']['tag']
+				]
 			if matched_tags != []:
 				for f in matched_tags:
-					print(f)
+					# print(f)
+					# print("XX XX XX XX")
 					# print(field)
-					if not str(field) in matched_fields:
-						if f['data']['text'] == field['data']['text']:
-							row['fields'][f['column']] = f
-							matched_fields.append(str(f))
-							row['fields'][field['column']] = field
-							matched_fields.append(str(field))
-						else:
-							f['color'] = 'yellow'
-							field['color'] = 'yellow'
-							row['fields'][f['column']] = f
-							matched_fields.append(str(f))
-							row['fields'][field['column']] = field
-							matched_fields.append(str(field))
+					# if not str(field) in matched_fields:
+					if f['data']['text'] == field['data']['text']:
+						row['fields'][f['column']] = f
+						matched_fields.append(str(f))
+						row['fields'][field['column']] = field
+						matched_fields.append(str(field))
+					else:
+						f['color'] = 'yellow'
+						field['color'] = 'yellow'
+						row['fields'][f['column']] = f
+						matched_fields.append(str(f))
+						row['fields'][field['column']] = field
+						matched_fields.append(str(field))
 
 			if matched_tags == []:
 				other_columns = [
 					x for x in range(num_records)
 					if not x == field['column']
 					]
-				print('*** ***')
-				print(other_columns)
-				print('*** ***')
+				# print('*** ***')
+				# print(other_columns)
+				# print('*** ***')
 				field['color'] = 'green'
 				row['fields'][field['column']] = field
 				for other_column in other_columns:
@@ -168,7 +179,7 @@ def compare_records(record_id_list,oclc=None):
 					row['fields'][other_column]['column'] = other_column
 					matched_fields.append(str(field))
 
-			print(row)
+			# print(row)
 			intermediate = row['fields']
 			for x in row['fields']:
 				if x == None:
@@ -234,7 +245,7 @@ def pull_oclc(oclc_number):
 			'-xml2json'
 		]
 		subprocess.run(to_json_command)
-
+		# time.sleep(5)
 		parse_json(
 			0,
 			os.path.join(tmp_path,'yaz_oclc_record.json'),

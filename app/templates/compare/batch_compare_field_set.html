@@ -1,6 +1,5 @@
 {% import "bootstrap/utils.html" as utils %}
 {% extends "base.html" %}
-{% block title %}Comparing two batches for 6xx data{% endblock %}
 {% block content %}
 <div class="card">
 	<br/>
@@ -25,10 +24,8 @@
           <thead>
             <tr>
 							<th >Compare records</th>
-							{% set cols = session_dict['batches'] | length %}
-							{% set width = 90/cols | int %}
 							{% for batch in session_dict['batches'] %}
-	              <th > Batch source: {{ batch['source'] }} </th>
+	              <th colspan="{{ batch['colspan'] }}"> Batch source: {{ batch['source'] }} </th>
 							{% endfor %}
             </tr>
           </thead>
