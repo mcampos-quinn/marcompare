@@ -4,9 +4,9 @@ venv
 __pycache__
 
 *.pyc
-*.db
 *.coverage
 .DS_Store
+app.db
 env.sh
 htmlcov
 config.py
