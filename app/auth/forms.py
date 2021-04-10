@@ -8,6 +8,6 @@ class LoginForm(FlaskForm):
 	"""
 	Form for users to login
 	"""
-	email = StringField('Email', validators=[DataRequired(), Email()])
-	password = PasswordField('Password', validators=[DataRequired()])
-	submit = SubmitField('Login')
+	email = StringField('email', validators=[DataRequired(), Email()])
+	password = PasswordField('password', validators=[DataRequired()])
+	submit = SubmitField('login')

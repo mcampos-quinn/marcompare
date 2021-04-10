@@ -1,19 +1,3 @@
-.rainbow {
-    background: linear-gradient(
-        rgba(255, 0, 0, 1) 0%,
-        rgba(255, 154, 0, 1) 10%,
-        rgba(208, 222, 33, 1) 20%,
-        rgba(79, 220, 74, 1) 30%,
-        rgba(63, 218, 216, 1) 40%,
-        rgba(47, 201, 226, 1) 50%,
-        rgba(28, 127, 238, 1) 60%,
-        rgba(95, 21, 242, 1) 70%,
-        rgba(186, 12, 248, 1) 80%,
-        rgba(251, 7, 217, 1) 90%,
-        rgba(255, 0, 0, 1) 100%
-    );
-}
-
 table.table-fit {
     width: auto !important;
     table-layout: auto !important;
@@ -24,3 +8,113 @@ table.table-fit thead th, table.table-fit tfoot th {
 table.table-fit tbody td, table.table-fit tfoot td {
     width: auto !important;
 }
+
+
+
+.card {
+	background: #e0b9b9;
+}
+
+.submit-button {
+	background: #a7eddd;
+}
+
+.login {
+	background: #f7e4ae;
+}
+
+.container h1, .card h1, .navbar {
+	/* color: #7d5a44; */
+}
+
+.navbar {
+  font-family: 'Ultra', serif;
+}
+
+.navbr-brand {
+	.font-size: 2.25rem;
+}
+
+button.navbar-toggler {
+	background: #a7eddd;
+	/* color: #7d5a44; */
+}
+
+.custom-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(125,90,68,1)' stroke-width='4' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+.table {
+	font-family: 'Montserrat', sans-serif;
+}
+
+.table th {
+	padding: .75rem;
+	vertical-align: middle;
+	font-size: 1.25rem
+}
+
+.table a {
+	color: #4147d1;
+}
+
+.table-danger {
+	background-color: #f72323;
+	color: #000000;
+}
+
+.table-success {
+	background-color: #23f789;
+}
+
+a {
+	color: #7d5a44;
+}
+
+body {
+	color: #7d5a44;
+	background: #e0b9b9;
+	font-family: 'Ultra', serif;
+}
+
+.strawberry {
+	background-color: #ff8c8c;
+}
+
+.tangerine {
+	background-color: #eea447;
+}
+
+.cream {
+	background-color: #f7e4ae;
+}
+
+.pistachio {
+	background-color: #a7eddd;
+}
+
+.blueberry {
+	background-color: #96c0f5;
+}
+
+.indigo {
+	background-color: #878cff;
+}
+
+.violet {
+	background-color: #d78cff;
+}
+
+
+/* strawberry: #ff8c8c; */
+/* tangerine: #eea447; */
+/* cream:  #f7e4ae  */
+/* pistachio: #a7eddd; */
+/* blueberry: #8c9eff; */
+/* indigo: #4147d1; */
+/* violet: #d78cff; */
+/* pink: #e0b9b9; */
+/* chocolate: #7d5a44; */
+/* fire engine: #f72323; */
+/* lime: #23f789; */
+/* indigo: #4147d1; */

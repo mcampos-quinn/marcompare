@@ -1,41 +1,41 @@
 {% import "bootstrap/utils.html" as utils %}
 {% extends "base.html" %}
-{% block title %}Perform an analysis{% endblock %}
+{% block title %}perform an analysis{% endblock %}
 {% block content %}
 <div class="card">
 	{{ utils.flashed_messages() }}
 	<div class="card-body">
 		{% if id %}
 			{% if session_timestamp %}
-				<h1>Analysis menu</h1>
-				<h1>For session {{ id }}, started {{ session_timestamp }}</h1>
+				<h1>analysis menu</h1>
+				<h1>for session {{ id }}, started {{ session_timestamp }}</h1>
 			{% endif %}
 			<div class="list-group active ">
-				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare', id=id) }}">
+				<a class="list-group-item list-group-item-action strawberry" href="{{ url_for('compare.batch_compare', id=id) }}">
 		      Overview batch comparison
 		    </a>
-				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_author', id=id) }}">
+				<a class="list-group-item list-group-item-action tangerine" href="{{ url_for('compare.batch_compare_author', id=id) }}">
 		      Author/Creator (1xx) batch comparison
 		    </a>
-				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_title', id=id) }}">
+				<a class="list-group-item list-group-item-action cream" href="{{ url_for('compare.batch_compare_title', id=id) }}">
 		      Title/Publisher (2xx) batch comparison
 		    </a>
-				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_physical', id=id) }}">
+				<a class="list-group-item list-group-item-action pistachio" href="{{ url_for('compare.batch_compare_physical', id=id) }}">
 		      Physical description (3xx) batch comparison
 		    </a>
-				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_notes', id=id) }}">
+				<a class="list-group-item list-group-item-action blueberry" href="{{ url_for('compare.batch_compare_notes', id=id) }}">
 		      Notes (5xx) batch comparison
 		    </a>
-				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_subjects', id=id) }}">
+				<a class="list-group-item list-group-item-action indigo" href="{{ url_for('compare.batch_compare_subjects', id=id) }}">
 		      Subject (6xx) batch comparison
 		    </a>
-				<a class="list-group-item list-group-item-action" href="{{ url_for('compare.batch_compare_added_author', id=id) }}">
+				<a class="list-group-item list-group-item-action violet" href="{{ url_for('compare.batch_compare_added_author', id=id) }}">
 		      Added author (7xx) batch comparison
 		    </a>
 			</div>
 		{% else %}
 		<div class="card">
-			<p>You don't have any sessions to compare. <a href="{{ url_for('compare.start_session') }}">Start a session.</a></p>
+			<p>you don't have any sessions to compare :'(. <a href="{{ url_for('compare.start_session') }}">Start a session.</a></p>
 		</div>
 		{% endif %}
 	</div>

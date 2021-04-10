@@ -6,14 +6,14 @@
 <div class="card">
 	<div class="card-body">
 		{{ utils.flashed_messages() }}
-		<h1>Upload files to compare</h1>
+		<h1>UPLOAD FILES TO COMPARE</h1>
 		<hr>
 		<form class="" action="" enctype="multipart/form-data" method="POST" role="form">
 			{{ form.hidden_tag() }}
 			<div class="form-group row">
 				{{ form.session_notes.label(class="col-sm-4 col-form-label") }}
 				<div class="col-sm-8">
-					{{ form.session_notes(class="form-control",placeholder="Brief note about this session") }}
+					{{ form.session_notes(class="form-control",placeholder="brief note about this session") }}
 				</div>
 			</div>
 			<hr>
@@ -26,7 +26,7 @@
 			<div class="form-group row">
 				{{ form.batch_1_source.label(class="col-sm-4 col-form-label") }}
 				<div class="col-sm-8">
-					{{ form.batch_1_source(class="form-control",placeholder="Where is this batch from?") }}
+					{{ form.batch_1_source(class="form-control",placeholder="where is this batch from?") }}
 				</div>
 			</div>
 			<div class="form-group row">
@@ -51,7 +51,7 @@
 			<div class="form-group row">
 				{{ form.batch_2_source.label(class="col-sm-4 col-form-label") }}
 				<div class="col-sm-8">
-					{{ form.batch_2_source(class="form-control",placeholder="Where is this batch from?") }}
+					{{ form.batch_2_source(class="form-control",placeholder="where is this batch from?") }}
 				</div>
 			</div>
 			<div class="form-group row">
@@ -68,7 +68,7 @@
 			</div>
 			<hr>
 
-			{{ form.submit(class="btn btn-primary")}}
+			{{ form.submit(class="btn submit-button")}}
 		</form>
 	</div>
 </div>

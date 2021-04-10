@@ -12,28 +12,28 @@ class FileUploadForm(FlaskForm):
 	Session upload form
 	tbd: how to handle more than two files
 	'''
-	session_notes = StringField('Session notes')
-	batch_1 = FileField('Batch 1',validators=[FileRequired(),FileAllowed(['json'])])
-	batch_1_source = StringField('Batch source')
+	session_notes = StringField('session notes')
+	batch_1 = FileField('batch 1',validators=[FileRequired(),FileAllowed(['json'])])
+	batch_1_source = StringField('batch source')
 	batch_1_identifier_field = SelectField(
-		'Field w/ OCLC number',
+		'field w/ OCLC number',
 		choices=[('001', '001'), ('035', '035')],
 		default='001'
 		)
 	batch_1_namespaces = BooleanField(
-		'Does this file use XML namespaces?',
+		'does this file use XML namespaces?',
 		default=False
 		)
 
-	batch_2 = FileField('Batch 2',validators=[FileRequired(),FileAllowed(['json'])])
-	batch_2_source = StringField('Batch source')
+	batch_2 = FileField('batch 2',validators=[FileRequired(),FileAllowed(['json'])])
+	batch_2_source = StringField('batch source')
 	batch_2_identifier_field = SelectField(
-		'Field w/ OCLC number',
+		'field w/ OCLC number',
 		choices=[('001', '001'), ('035', '035')],
 		default='001'
 		)
 	batch_2_namespaces = BooleanField(
-		'Does this file use XML namespaces?',
+		'does this file use XML namespaces?',
 		default=False
 		)
 	# batch_3 = FileField('File 3',validators=[FileAllowed(['json','csv','pdf'])])

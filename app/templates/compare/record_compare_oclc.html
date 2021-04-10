@@ -7,8 +7,8 @@
     <br/>
     {{ utils.flashed_messages() }}
     <br/>
-    <h1>Side by side comparison of records from session {{ session_id }}</h1>
-		<a href="{{ url_for('compare.analysis_menu', id=session_id)}}">Back to analysis menu for session {{ session_id }}</a>
+    <h1>side by side comparison of records from session {{ session_id }}</h1>
+		<a href="{{ url_for('compare.analysis_menu', id=session_id)}}">back to analysis menu for session {{ session_id }}</a>
       <hr>
 			{% if compare_dict['records'] != [] %}
 				<!-- <p>{{compare_dict}}</p> -->
@@ -29,10 +29,10 @@
 						</tr>
 						<tr colspan="{{ field_cols }}">
 							{% for record in compare_dict['records'] if not record['record'] == None %}
-								<th width="{{ tag_width }}%">Field number</th>
-								<th width="{{ ind_width }}%">Ind 1</th>
-								<th width="{{ ind_width }}%">Ind 2</th>
-								<th width="{{ text_width }}%">Field text</th>
+								<th width="{{ tag_width }}%">field number</th>
+								<th width="{{ ind_width }}%">ind 1</th>
+								<th width="{{ ind_width }}%">ind 2</th>
+								<th width="{{ text_width }}%">field text</th>
 							{% endfor %}
 						</tr>
 					</thead>
