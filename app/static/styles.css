@@ -19,6 +19,14 @@ table.table-fit tbody td, table.table-fit tfoot td {
 	background: #a7eddd;
 }
 
+.show-all-button {
+	background: #eea447;
+}
+
+.show-discrepancies-button {
+	background: #d78cff;
+}
+
 .login {
 	background: #f7e4ae;
 }
