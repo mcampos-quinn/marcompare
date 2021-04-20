@@ -218,6 +218,7 @@ def batch_compare_field_set(current_session_id,field_set):
 		'batches':batches,
 		'session_timestamp': session_timestamp,
 		'session_timestamp_int': re.sub(r"\D", "", session_timestamp),
+		'session_max_records': '',
 		'rows':[{'row':0,'records':[]}]}
 
 	with hookup.engine.connect() as connection:
@@ -255,7 +256,7 @@ def batch_compare_field_set(current_session_id,field_set):
 					# and (x['batch_id'] != _record['batch_id'])
 					]
 				if not oclc_match == []:
-					print(oclc_match)
+					# print(oclc_match)
 					oclc_match = oclc_match[0]
 					if oclc_match[field_set_count] > _record[field_set_count]:
 						_record['color'] = 'red'
@@ -278,10 +279,9 @@ def batch_compare_field_set(current_session_id,field_set):
 			row['record_ids'].append(_record['id'])
 			# @fixme this result list includes records
 			# that are dupe OCLC records in a system
+			# update: that's... a good thing
 			_match = [item for item in records if item['oclc_match'] == _record['id']]
-			# for item in _match:
 			for item in _match:
-				# if not item['data']['batch_id'] == _record['data']['batch_id']:
 				i = build_field_comparison_dict(item,field_set_count)
 				row['records'].append(i)
 				row['record_ids'].append(item['id'])
@@ -292,20 +292,59 @@ def batch_compare_field_set(current_session_id,field_set):
 			compare['rows'].append(row)
 			row_counter += 1
 
-	columns = [i for i in range(len(my_batches))]
 	# print(compare['rows'])
-	for x in columns:
+	empty_record = {'id':'empty','column':''}
+	# get the number of columns necessary, i.e. the number of batches
+	# in the session.
+	# iterate over this integer's range() and match each
+	# to the batch's column.
+	# this sets the width of each batch's column in display
+	columns = [i for i in range(len(my_batches))]
+	# print("* ^ "*100)
+	# print(columns)
+	# use this integer to get the right number of <th> tags in the table
+	session_max_records = 0
+	for column_index in columns:
+		# print(column_index)
 		counts = []
 		for row in compare['rows']:
-			# print(row['records'])
-			count = [r['column'] for r in row['records']].count(x)
+			# go through each row and count how many records
+			# are in each batch's column
+			count = [r['column'] for r in row['records']].count(column_index)
 			counts.append(count)
 		colspan = max(counts)
-		for batch in batches:
-			if batch['column'] == x:
+		session_max_records += colspan
+		# print("** ** "*100)
+		# print(colspan)
+		for batch in compare['batches']:
+			# now set the <th> colspan attribute for each batch to the correct
+			# number of records
+			if batch['column'] == column_index:
 				batch['colspan'] = colspan
+		for row in compare['rows']:
+			# now if there are fewer records than the max in a given column
+			# fluff out the row with extra empty records so the table
+			# will have the correct shape (i.e. the right number of <td> per row)
+			count = [r['column'] for r in row['records']].count(column_index)
+			# print("%% %% "*100)
+			# print(x)
+			# print([r['column'] for r in row['records']])
+			if count < colspan:
+				empties = abs(colspan - count)
+				# print("EMPTIES")
+				# print(empties)
+				# print(count)
+				# print(list(range(empties)))
+				for x in list(range(empties)):
+					empty_record['column'] = column_index
+					row['records'].append(empty_record)
+					empty_record['column'] = ''
 
 	# print(compare)
+	# get 1-indexed version of the max number of records in a row
+	#
+	session_max_records = list(range(session_max_records+1))[1:]
+	compare['session_max_records'] = session_max_records
 	_session = Session.query.get(current_session_id)
 	setattr(_session,stored_comparison_dict,str(compare))
 	db.session.commit()

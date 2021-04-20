@@ -12,6 +12,36 @@ $(".btn").click(function () {
   }
 });
 
+
+// Bootstrap-table function for export... doesn't really do what i want....
+// https://examples.bootstrap-table.com/#extensions/export.html#view-source
+//
+var $table = $('#table')
+$(function() {
+  $('#toolbar').find('select').change(function () {
+    $table.bootstrapTable('destroy').bootstrapTable({
+      exportDataType: $(this).val(),
+      exportTypes: ['json','csv', 'txt','excel'],
+      columns: [
+        {
+          field: 'state',
+          checkbox: true,
+          visible: $(this).val() === 'selected'
+        },
+        {
+          field: 'row',
+          title: 'Row'
+        }, {
+          field: 'record1',
+          title: 'record 1'
+        }, {
+          field: 'record2',
+          title: 'record2'
+        }
+      ]
+    })
+  }).trigger('change')
+})
 // this is for displaying tables using JQuery DataTables
 // var table = $('#compareTable').DataTable();
 //

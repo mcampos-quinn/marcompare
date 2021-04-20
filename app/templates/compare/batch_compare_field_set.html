@@ -10,48 +10,72 @@
 		<h1>For session {{ id }}, started {{ session_dict['session_timestamp'] }}</h1>
 		<a href="{{ url_for('compare.analysis_menu', id=id) }}">Back to analysis menu for session {{ id }}</a>
     <hr>
+		<!-- <div id="toolbar" class="select">
+		  <select class="form-control">
+		    <option value="all">Export All</option>
+		    <option value="selected">Export Selected</option>
+		  </select>
+		</div> -->
 		{% if session_dict['batches'] != [] %}
 			<div class="btn-group" role="group" aria-label="data list options">
 				<button type="button" class="btn show-all-button" id="show-all">Show all the records</button>
 				<button type="button" class="btn show-discrepancies-button" id ="show-discrepancies">Show only records with discrepancies</button>
 			</div>
 			<hr>
-				<div class="table-responsive table-body">
+				<div class="table-responsive fixed-table-body table-fit">
 				<table
-					data-toggle="table"
-					data-search="true"
-					data-pagination="false">
+				data-toggle="table"
+				data-search="true"
+				data-pagination="false"
+				data-show-export="false"
+				data-click-to-select="false"
+			  data-toolbar="#toolbar"
+			  data-show-toggle="false"
+				data-show-columns="false">
           <thead>
             <tr>
-							<th >Compare records</th>
+							<th></th>
+							<th></th>
 							{% for batch in session_dict['batches'] %}
-	              <th colspan="{{ batch['colspan'] }}"> batch source: {{ batch['source'] }} </th>
+	              <th colspan="{{ batch['colspan'] }}">batch source: {{ batch['source'] }}</th>
 							{% endfor %}
             </tr>
+						<tr>
+							<th></th>
+							<th>Compare records</th>
+							{% for rec in session_dict['session_max_records'] %}
+	              <th>Record {{ rec }}</th>
+							{% endfor %}
+						</tr>
           </thead>
           <tbody>
           {% for row in session_dict['rows'] if not row['row'] == 0 %}
 						{% if row['records'][0]['data']['color'] %}
 	            <tr class="diffRecords">
+								<td></td>
 								<td>
 									<a href="{{ url_for(
 										'compare.record_compare',
 										records=row['record_ids'],
 										session_id=id) }}">
-										{{ row['row'] }}
+										Row {{ row['row'] }}
 									</a>
 								</td>
 								{% for record in row['records'] %}
-									{% if record['data']['color'] == 'green' %}
-										<td class="table-success">
-											Record <b>{{ record['id'] }}</b> has <b>{{ record['data'][field_set_count] }} {{ field_set }} fields</b>.<br>
-											{{ record['data']['title'] }}
-			              </td>
-									{% elif record['data']['color'] == 'red' %}
-										<td class="table-danger">
-											Record <b>{{ record['id'] }}</b> has <b>{{ record['data'][field_set_count] }} {{ field_set }} fields</b>.<br>
-											{{ record['data']['title'] }}
-										</td>
+									{% if not record['id'] == 'empty' %}
+										{% if record['data']['color'] == 'green' %}
+											<td class="table-success">
+												Record <b>{{ record['id'] }}</b> has <b>{{ record['data'][field_set_count] }}</b> {{ field_set }} fields.
+												{{ record['data']['title'] }}
+				              </td>
+										{% elif record['data']['color'] == 'red' %}
+											<td class="table-danger">
+												Record <b>{{ record['id'] }}</b> has <b>{{ record['data'][field_set_count] }}</b> {{ field_set }} fields.
+												{{ record['data']['title'] }}
+											</td>
+										{% endif %}
+									{% else %}
+										<td></td>
 									{% endif %}
 								{% endfor %}
 	            </tr>
@@ -62,26 +86,32 @@
 									'compare.record_compare',
 									records=row['record_ids'],
 									session_id=id) }}">
-									{{ row['row'] }}
+									Row {{ row['row'] }}
 								</a>
 							</td>
 							{% for record in row['records'] %}
-								<td>
-									Record <b>{{ record['id'] }}</b> has <b>{{ record['data'][field_set_count] }} {{ field_set }} fields</b>.<br>
-									{{ record['data']['title'] }}
-								</td>
+								{% if not record['id'] == 'empty' %}
+									<td>
+										Record <b>{{ record['id'] }}</b> has <b>{{ record['data'][field_set_count] }}</b> {{ field_set }} fields.<br>
+										{{ record['data']['title'] }}
+									</td>
+								{% else %}
+									<td></td>
+								{% endif %}
 							{% endfor %}
 						</tr>
 						{% endif %}
           {% endfor %}
           </tbody>
         </table>
-
 				</div>
+				<hr>
 			{% else %}
 			<p>This session has no data to compare :/</p>
 			{% endif%}
   </div>
 </div>
+
+
 
 {% endblock %}
