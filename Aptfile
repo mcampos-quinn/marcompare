@@ -1,0 +1,3 @@
+# install packages on Heroku Ubuntu
+# yaz is the z39.50 library used to query OCLC
+yaz
