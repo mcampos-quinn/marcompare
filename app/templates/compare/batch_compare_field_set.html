@@ -35,13 +35,11 @@
           <thead>
             <tr>
 							<th></th>
-							<th></th>
 							{% for batch in session_dict['batches'] %}
 	              <th colspan="{{ batch['colspan'] }}">batch source: {{ batch['source'] }}</th>
 							{% endfor %}
             </tr>
 						<tr>
-							<th></th>
 							<th>Compare records</th>
 							{% for rec in session_dict['session_max_records'] %}
 	              <th>Record {{ rec }}</th>
@@ -52,7 +50,6 @@
           {% for row in session_dict['rows'] if not row['row'] == 0 %}
 						{% if row['records'][0]['data']['color'] %}
 	            <tr class="diffRecords">
-								<td></td>
 								<td>
 									<a href="{{ url_for(
 										'compare.record_compare',
