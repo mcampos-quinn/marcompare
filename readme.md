@@ -57,7 +57,7 @@ The records and fields are stored in a SQLite database locally. A good chunk of 
 ## Dependencies
 
 * Flask and related packages:
-	* `pip3 install flask flask-sqlalchemy flask-wtf flask-login flask-bootstrap flask-migrate sqlalchemy wtforms`
+	* `pip3 install flask flask-sqlalchemy flask-wtf flask-login flask-bootstrap flask-migrate sqlalchemy wtforms email_validator wtforms_sqlalchemy`
 	* optionally: `flask_debugtoolbar`
 * For OCLC Z39.50 querying (optional?):
 	* [MarcEdit](https://marcedit.reeset.net/)

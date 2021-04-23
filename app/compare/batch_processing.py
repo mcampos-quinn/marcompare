@@ -243,18 +243,30 @@ def parse_record(record,prefix,batch_id,identifier_field):
 		[x for x in record[prefix+'datafield'] if x['@tag'] == '856']
 		)
 	# Loop thru all the control fields and grab data
-	for control_tag in record[prefix+'controlfield']:
+	if isinstance(record[prefix+'controlfield'],list):
+		for control_tag in record[prefix+'controlfield']:
+			tag_dict = {}
+			tag_dict['tag'] = control_tag['@tag']
+			tag_dict['indicator_1'] = None
+			tag_dict['indicator_2'] = None
+			tag_dict['text'] =  control_tag['#text'].lstrip('0')
+
+			record_dict['fields'].append(tag_dict)
+			# Now look for an OCLC number
+			if identifier_field == '001':
+				if control_tag['@tag'] == '001':
+					record_dict['oclc_number'] = re.sub(r"\D", "", control_tag['#text']).lstrip('0')
+	elif isinstance(record[prefix+'controlfield'],dict):
 		tag_dict = {}
-		tag_dict['tag'] = control_tag['@tag']
+		tag_dict['tag'] = record[prefix+'controlfield']['@tag']
 		tag_dict['indicator_1'] = None
 		tag_dict['indicator_2'] = None
-		tag_dict['text'] =  control_tag['#text'].lstrip('0')
-
+		tag_dict['text'] =  record[prefix+'controlfield']['#text'].lstrip('0')
 		record_dict['fields'].append(tag_dict)
 		# Now look for an OCLC number
 		if identifier_field == '001':
 			if control_tag['@tag'] == '001':
-				record_dict['oclc_number'] = re.sub(r"\D", "", control_tag['#text']).lstrip('0')
+				record_dict['oclc_number'] = re.sub(r"\D", "", record[prefix+'controlfield']['#text']).lstrip('0')
 
 	# Loop thru all the data fields and grab data
 	for data_tag in record[prefix+'datafield']:
