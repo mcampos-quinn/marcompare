@@ -1,0 +1,24 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+{% block title %}
+    {% if add_user %}
+        Add User
+    {% else %}
+        Edit User
+    {% endif %}
+{% endblock %}
+{% block content %}
+<div class="card">
+	<div class="card-body">
+    {% if add_user %}
+        <h1>Add User</h1>
+    {% else %}
+        <h1>Edit User</h1>
+    {% endif %}
+    <br/>
+    {{ wtf.quick_form(form) }}
+    <br/>
+    <a class="btn strawberry" href="{{ url_for('admin.list_users') }}" role="button">Cancel</a>
+	</div>
+</div>
+{% endblock %}

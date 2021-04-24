@@ -7,19 +7,10 @@ class AddUserForm(FlaskForm):
 	"""
 	Form for admin to create users
 	"""
-	department_id = QuerySelectField(
-		query_factory=lambda: Department.query.all(),
-		get_pk=lambda x: x.id,
-		get_label="deptname",
-		allow_blank=True,
-		blank_text=''
-		)
+
 	email = StringField('email address', validators=[DataRequired(),Email()])
-	username = StringField('username', validators=[DataRequired()])
-	first_name = StringField('First name', validators=[DataRequired()])
-	last_name = StringField('Last name', validators=[DataRequired()])
-	RSusername = StringField('ResourceSpace username', validators=[DataRequired()])
-	RSkey = StringField('ResourceSpace API key', validators=[DataRequired()])
+	username = StringField('username')
+	affiliation = StringField('affiliation')
 	is_admin = BooleanField('Admin?')
 	password = PasswordField('Password', validators=[EqualTo('confirm_password')])
 	confirm_password = PasswordField('Confirm Password')
@@ -37,16 +28,11 @@ class EditUserForm(FlaskForm):
 	otherwise editing an existing user will fail.
 	There's a better way to do it I know but I;m in a hurry. :/
 	"""
-	department_id = QuerySelectField(
-		query_factory=lambda: Department.query.all(),
-		get_pk=lambda x: x.id,
-		get_label="deptname",
-		allow_blank=True,
-		blank_text=u'Select a department'
-		)
 	email = StringField('email address', validators=[DataRequired(),Email()])
+	username = StringField('username')
 	affiliation = StringField('affiliation')
-	password = PasswordField('Password', validators=[EqualTo('confirm_password')])
-	confirm_password = PasswordField('Confirm Password')
+	is_admin = BooleanField('admin?')
+	password = PasswordField('password', validators=[EqualTo('confirm_password')])
+	confirm_password = PasswordField('confirm password')
 
-	submit = SubmitField('Submit')
+	submit = SubmitField('submit')

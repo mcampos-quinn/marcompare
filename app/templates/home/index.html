@@ -9,11 +9,11 @@
     {% else %}
         {% if current_user.is_admin %}
             <div class="card-body">
-                <a href="{{ url_for('home.admin_dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('home.admin_dashboard') }}">go to the admin dashboard</a>
             </div>
         {% else %}
             <div class="card-body">
-                <a href="{{ url_for('home.dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('home.dashboard') }}">go to the dashboard</a>
             </div>
         {% endif %}
     {% endif %}
