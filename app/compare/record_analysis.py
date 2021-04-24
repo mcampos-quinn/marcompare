@@ -14,7 +14,7 @@ import app
 from .. import db
 from .. models import Session, Batch, Record, Field
 from .. import app_utils
-from .. app_utils import get_session_timestamp, get_session_batches
+from .. app_utils import get_session_timestamp, get_session_batches, get_system
 
 from .db_handling import DB_Hookup
 from .batch_processing import parse_json
@@ -205,6 +205,11 @@ def pull_oclc(oclc_number):
 	# do a z39.50 query to get the current OCLC main record
 	output = None
 	marcedit_path = current_app.config['MARCEDIT_BINARY_PATH']
+	system = get_system()
+	marcedit_prefix = ''
+	if system == 'linux':
+		# on linux you need to call the mono framework to use the marcedit CLI
+		marcedit_prefix = 'mono'
 	oclc_z3950_auth = current_app.config['OCLC_Z3950_AUTH']
 	# marcedit_path = current_app.config['MARCEDIT_BINARY_PATH']
 	tmp_path = current_app.config['UPLOAD_FOLDER']
@@ -232,6 +237,7 @@ def pull_oclc(oclc_number):
 		# do an annoying back and forth w MARCEdit to get the record in
 		# the correct XML/JSON formats
 		to_xml_command = [
+			marcedit_prefix,
 			marcedit_path,
 			'-s',yaz_oclc_record_marc_path,
 			'-d',yaz_oclc_record_xml_path,
@@ -239,6 +245,7 @@ def pull_oclc(oclc_number):
 		]
 		subprocess.run(to_xml_command)
 		to_json_command = [
+			marcedit_prefix,
 			marcedit_path,
 			'-s',yaz_oclc_record_xml_path,
 			'-d',yaz_oclc_record_json_path,

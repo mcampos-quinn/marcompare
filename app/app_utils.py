@@ -1,4 +1,5 @@
 import os
+import sys
 
 from flask import current_app
 
@@ -8,10 +9,20 @@ from . models import Session, Batch, Record
 def clean_temp_folder():
 	temp_folder = current_app.config['UPLOAD_FOLDER']
 	for item in os.listdir(temp_folder):
-		if not item.startswith('.'):
+		if not item.startswith(('.','yaz')):
 			os.remove(
 				os.path.join(temp_folder,item)
 			)
+
+def get_system():
+	if sys.platform.startswith("darwin"):
+		return "mac"
+	elif sys.platform.startswith("win"):
+		return "windows"
+	elif sys.platform.startswith("linux"):
+		return "linux"
+	else:
+		return False
 
 def get_session_timestamp(session_id):
 	timestamp = Session.query.get(session_id).started_timestamp.strftime("%Y-%m-%d, %H:%M:%S")

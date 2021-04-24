@@ -13,7 +13,7 @@ from . forms import FileUploadForm, SessionForm
 from .. import db
 from .. models import Batch, Session
 from .. import app_utils
-from .. app_utils import get_session_timestamp
+from .. app_utils import get_session_timestamp, clean_temp_folder
 
 def check_admin():
 	"""
@@ -34,6 +34,8 @@ def start_session():
 		session_id = batch_processing.create_session(current_user.id)
 		batch_processing.process_batches(session_id,request)
 		batch_processing.read_files(session_id)
+
+		clean_temp_folder()
 
 		return redirect(url_for('compare.list_sessions'))
 

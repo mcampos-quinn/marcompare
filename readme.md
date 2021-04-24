@@ -61,8 +61,9 @@ The records and fields are stored in a SQLite database locally. A good chunk of 
 	* optionally: `flask_debugtoolbar`
 * For OCLC Z39.50 querying (optional?):
 	* [MarcEdit](https://marcedit.reeset.net/)
+	  * On Linux, using MarcEdit requires installing the [Mono](http://www.mono-project.com/download/stable/#download-lin-ubuntu) framework to run the Windows `cmarcedit.exe` executable. Also, when you set `MARCEDIT_BINARY_PATH`, it should be the path to `cmarcedit.exe` rather than `MarcEdit.exe`.
 	* `yaz`
-		* `brew install yaz`
+		* `brew install yaz`/`sudo apt-get install yaz`
 
 ## Setup details
 
