@@ -41,7 +41,7 @@ def create_app():#config_name):
 	from app import models
 	from flask_debugtoolbar import DebugToolbarExtension
 
-	toolbar = DebugToolbarExtension(app)
+	# toolbar = DebugToolbarExtension(app)
 
 
 
