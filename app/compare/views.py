@@ -44,6 +44,13 @@ def start_session():
 		title="Start comparing",
 		form=form)
 
+@compare.route('/instructions',methods=['GET','POST'])
+def instructions():
+	"""
+	Render the instructions template on the /instructions route
+	"""
+	return render_template('compare/instructions.html', title="Instructions")
+
 @compare.route('/list_sessions', methods=['GET','POST'])
 @login_required
 def list_sessions():
