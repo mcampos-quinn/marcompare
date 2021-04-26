@@ -87,9 +87,6 @@ def edit_user(id):
 	user = User.query.get_or_404(id)
 	form = EditUserForm(obj=user)
 	if form.validate_on_submit():
-		# print(form.data)
-		if not form.department_id.data == None:
-			user.department_id=form.department_id.data.id
 		user.email = form.email.data
 		user.username = form.username.data
 		user.affiliation = form.affiliation.data
