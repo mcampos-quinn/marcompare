@@ -1,0 +1,51 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+{% block title %}
+  Edit my account
+{% endblock %}
+{% block content %}
+<div class="card">
+	<div class="card-body">
+    <h1>Edit My Account</h1>
+		<form class="" action="" enctype="multipart/form-data" method="POST" role="form">
+			{{ form.hidden_tag() }}
+			<div class="form-group row">
+				{{ form.email.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.email(class="form-control",placeholder="email") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.username.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.username(class="form-control",placeholder="username") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.affiliation.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.affiliation(class="form-control",placeholder="affiliation") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.password.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.password(class="form-control",placeholder="password") }}
+				</div>
+			</div>
+			<div class="form-group row">
+				{{ form.confirm_password.label(class="col-sm-4 col-form-label") }}
+				<div class="col-sm-8">
+					{{ form.confirm_password(class="form-control",placeholder="confirm password") }}
+				</div>
+			</div>
+
+			<hr>
+
+			{{ form.submit(class="btn submit-button")}}
+		</form>
+    <br/>
+    <a class="btn strawberry" href="{{ url_for('home.homepage') }}" role="button">Cancel</a>
+	</div>
+</div>
+{% endblock %}

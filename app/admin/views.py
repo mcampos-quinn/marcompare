@@ -135,3 +135,41 @@ def delete_user(id):
 	return redirect(url_for('admin.list_users'))
 
 	return render_template(title="Delete User")
+
+@admin.route('/account/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def account(id):
+	"""
+	Allow user to edit account
+	"""
+
+	user = User.query.get_or_404(id)
+	form = EditUserForm(obj=user)
+	if form.validate_on_submit():
+		user.email = form.email.data
+		user.username = form.username.data
+		user.affiliation = form.affiliation.data
+		if form.password.data:
+			user.password = form.password.data
+		try:
+			db.session.commit()
+			flash('You have successfully edited the user.')
+
+			# redirect to the users page
+			return redirect(url_for('home.homepage'))
+		except Exception as e:
+			print(e)
+			flash('Error editing your account :/')
+			return redirect(url_for('home.homepage'))
+
+	# this pre-populates the form with existing data from the db
+	form.email.data = user.email
+	form.username.data = user.username
+	form.affiliation.data = user.affiliation
+	return render_template(
+		'admin/account.html',
+		action="Edit",
+		form=form,
+		user=user,
+		title="Edit Account"
+		)

@@ -61,10 +61,11 @@ def list_sessions():
 	SELECT sessions.id, sessions.started_timestamp, sessions.notes, GROUP_CONCAT(batches.source, ' ; ') AS sources
 	FROM sessions
 	JOIN batches ON sessions.id=batches.session_id
+	JOIN users ON sessions.user_id=:user_id
 	GROUP BY sessions.id, sessions.started_timestamp;
 	'''
 	# sql = "select sessions.id, sessions.started_timestamp, group_concat(batches.source) from sessions join batches on sessions.id=batches.session_id group by sessions.id, sessions.started_timestamp;"
-	sessions = db.session.execute(list_sessions_sql).fetchall()
+	sessions = db.session.execute(list_sessions_sql,{'user_id':current_user.id}).fetchall()
 	return render_template(
 		'compare/list_sessions.html',
 		title="Your comparison sessions",
