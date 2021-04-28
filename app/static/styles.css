@@ -86,12 +86,24 @@ body {
 	font-family: 'Ultra', serif;
 }
 
+.how-to {
+	font-family: 'Montserrat', sans-serif;
+}
+
+.how-to a {
+	color: blue;
+}
+
 .strawberry {
 	background-color: #ff8c8c;
 }
 
 .tangerine {
 	background-color: #eea447;
+}
+
+.dreamsicle {
+	background-color: #f7c07c;
 }
 
 .cream {
@@ -117,6 +129,7 @@ body {
 
 /* strawberry: #ff8c8c; */
 /* tangerine: #eea447; */
+/* dreamsicle: #f7c07c */
 /* cream:  #f7e4ae  */
 /* pistachio: #a7eddd; */
 /* blueberry: #8c9eff; */

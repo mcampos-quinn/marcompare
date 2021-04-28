@@ -61,7 +61,7 @@ def list_sessions():
 	SELECT sessions.id, sessions.started_timestamp, sessions.notes, GROUP_CONCAT(batches.source, ' ; ') AS sources
 	FROM sessions
 	JOIN batches ON sessions.id=batches.session_id
-	JOIN users ON sessions.user_id=:user_id
+	WHERE sessions.user_id=:user_id
 	GROUP BY sessions.id, sessions.started_timestamp;
 	'''
 	# sql = "select sessions.id, sessions.started_timestamp, group_concat(batches.source) from sessions join batches on sessions.id=batches.session_id group by sessions.id, sessions.started_timestamp;"
