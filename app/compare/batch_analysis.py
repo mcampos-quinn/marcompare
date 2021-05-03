@@ -306,6 +306,7 @@ def batch_compare_field_set(current_session_id,field_set):
 	session_max_records = 0
 	for column_index in columns:
 		# print(column_index)
+		subcolumn = None
 		counts = []
 		for row in compare['rows']:
 			# go through each row and count how many records
